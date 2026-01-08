@@ -3,6 +3,7 @@ package com.example.mounttrack.data.repository
 import android.util.Log
 import com.example.mounttrack.data.firebase.FirebaseHelper
 import com.example.mounttrack.data.model.Mountain
+import com.example.mounttrack.data.model.HikingRoute
 import kotlinx.coroutines.tasks.await
 
 class MountainRepository {
@@ -29,6 +30,21 @@ class MountainRepository {
                     val data = doc.data
                     Log.d(TAG, "Mountain data: $data")
 
+                    // Parse routes with capacity data
+                    val routesData = (data?.get("routes") as? List<Map<String, Any>>) ?: emptyList()
+                    val routesMapped = routesData.map { routeMap ->
+                        mapOf(
+                            "routeId" to (routeMap["routeId"] ?: ""),
+                            "name" to (routeMap["name"] ?: ""),
+                            "difficulty" to (routeMap["difficulty"] ?: "Moderate"),
+                            "estimatedTime" to (routeMap["estimatedTime"] ?: ""),
+                            "distance" to (routeMap["distance"] ?: ""),
+                            "maxCapacity" to (routeMap["maxCapacity"] ?: 0L),
+                            "usedCapacity" to (routeMap["usedCapacity"] ?: 0L),
+                            "status" to (routeMap["status"] ?: HikingRoute.STATUS_OPEN)
+                        )
+                    }
+
                     Mountain(
                         mountainId = doc.id,
                         name = data?.get("name") as? String ?: "",
@@ -37,7 +53,7 @@ class MountainRepository {
                         elevation = (data?.get("elevation") as? Long)?.toInt() ?: 0,
                         description = data?.get("description") as? String ?: "",
                         imageUrl = data?.get("imageUrl") as? String ?: "",
-                        routes = (data?.get("routes") as? List<Map<String, Any>>) ?: emptyList(),
+                        routes = routesMapped,
                         isActive = data?.get("isActive") as? Boolean ?: true
                     )
                 } catch (e: Exception) {
@@ -65,6 +81,21 @@ class MountainRepository {
 
             val data = document.data
             if (data != null) {
+                // Parse routes with capacity data
+                val routesData = (data["routes"] as? List<Map<String, Any>>) ?: emptyList()
+                val routesMapped = routesData.map { routeMap ->
+                    mapOf(
+                        "routeId" to (routeMap["routeId"] ?: ""),
+                        "name" to (routeMap["name"] ?: ""),
+                        "difficulty" to (routeMap["difficulty"] ?: "Moderate"),
+                        "estimatedTime" to (routeMap["estimatedTime"] ?: ""),
+                        "distance" to (routeMap["distance"] ?: ""),
+                        "maxCapacity" to (routeMap["maxCapacity"] ?: 0L),
+                        "usedCapacity" to (routeMap["usedCapacity"] ?: 0L),
+                        "status" to (routeMap["status"] ?: HikingRoute.STATUS_OPEN)
+                    )
+                }
+
                 val mountain = Mountain(
                     mountainId = document.id,
                     name = data["name"] as? String ?: "",
@@ -73,7 +104,7 @@ class MountainRepository {
                     elevation = (data["elevation"] as? Long)?.toInt() ?: 0,
                     description = data["description"] as? String ?: "",
                     imageUrl = data["imageUrl"] as? String ?: "",
-                    routes = (data["routes"] as? List<Map<String, Any>>) ?: emptyList(),
+                    routes = routesMapped,
                     isActive = data["isActive"] as? Boolean ?: true
                 )
                 Log.d(TAG, "Mountain found: ${mountain.name}")
@@ -94,6 +125,31 @@ class MountainRepository {
             result.map { mountains ->
                 mountains.take(4)
             }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Get routes with capacity info for a mountain
+     */
+    suspend fun getRoutesWithCapacity(mountainId: String): Result<List<HikingRoute>> {
+        return try {
+            val mountain = getMountainById(mountainId).getOrThrow()
+            Result.success(mountain.getHikingRoutes())
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Get only available routes (open and has capacity)
+     */
+    suspend fun getAvailableRoutes(mountainId: String): Result<List<HikingRoute>> {
+        return try {
+            val routes = getRoutesWithCapacity(mountainId).getOrThrow()
+            val available = routes.filter { it.isAvailable }
+            Result.success(available)
         } catch (e: Exception) {
             Result.failure(e)
         }

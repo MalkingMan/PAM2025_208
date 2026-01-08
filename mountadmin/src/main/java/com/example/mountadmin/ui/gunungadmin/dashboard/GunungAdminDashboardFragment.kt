@@ -73,8 +73,10 @@ class GunungAdminDashboardFragment : Fragment() {
     }
 
     private fun setupRecyclerViews() {
-        // Route capacity adapter
-        routeCapacityAdapter = RouteCapacityAdapter()
+        // Route capacity adapter with status toggle
+        routeCapacityAdapter = RouteCapacityAdapter { routeCapacity ->
+            showRouteStatusDialog(routeCapacity)
+        }
         binding.rvRouteCapacity.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = routeCapacityAdapter
@@ -88,6 +90,30 @@ class GunungAdminDashboardFragment : Fragment() {
             adapter = recentRegistrationAdapter
             setHasFixedSize(true)
         }
+    }
+
+    private fun showRouteStatusDialog(routeCapacity: RouteCapacity) {
+        val currentStatus = routeCapacity.routeStatus
+        val newStatus = if (currentStatus == com.example.mountadmin.data.model.HikingRoute.STATUS_OPEN) {
+            com.example.mountadmin.data.model.HikingRoute.STATUS_CLOSED
+        } else {
+            com.example.mountadmin.data.model.HikingRoute.STATUS_OPEN
+        }
+
+        val message = if (newStatus == com.example.mountadmin.data.model.HikingRoute.STATUS_CLOSED) {
+            "Close route \"${routeCapacity.routeName}\"? Users won't be able to register for this route."
+        } else {
+            "Open route \"${routeCapacity.routeName}\"? Users will be able to register."
+        }
+
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Change Route Status")
+            .setMessage(message)
+            .setPositiveButton("Confirm") { _, _ ->
+                viewModel.updateRouteStatus(mountainId, routeCapacity.routeId.ifEmpty { routeCapacity.routeName }, newStatus)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun setupObservers() {

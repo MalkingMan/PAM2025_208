@@ -3,14 +3,18 @@ package com.example.mountadmin.ui.gunungadmin.dashboard
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.mountadmin.data.model.HikingRoute
 import com.example.mountadmin.data.model.Mountain
 import com.example.mountadmin.data.model.Registration
+import com.example.mountadmin.data.repository.RouteCapacityRepository
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
 
 class GunungAdminDashboardViewModel : ViewModel() {
 
     private val firestore = FirebaseFirestore.getInstance()
+    private val capacityRepository = RouteCapacityRepository()
 
     private val _mountain = MutableLiveData<Mountain?>()
     val mountain: LiveData<Mountain?> = _mountain
@@ -42,8 +46,8 @@ class GunungAdminDashboardViewModel : ViewModel() {
     fun loadDashboardData(mountainId: String) {
         _isLoading.value = true
 
-        // Load mountain data
-        loadMountainData(mountainId)
+        // Load mountain data with real capacity
+        loadMountainDataWithCapacity(mountainId)
 
         // Load registration statistics
         loadRegistrationStats(mountainId)
@@ -52,26 +56,66 @@ class GunungAdminDashboardViewModel : ViewModel() {
         loadRecentRegistrations(mountainId)
     }
 
-    private fun loadMountainData(mountainId: String) {
-        firestore.collection("mountains")
-            .document(mountainId)
-            .get()
-            .addOnSuccessListener { document ->
-                if (document.exists()) {
-                    val mountain = document.toObject(Mountain::class.java)?.copy(mountainId = document.id)
-                    _mountain.value = mountain
+    private fun loadMountainDataWithCapacity(mountainId: String) {
+        viewModelScope.launch {
+            val result = capacityRepository.getRoutesWithCapacity(mountainId)
 
-                    // Calculate route capacities
-                    mountain?.routes?.let { routes ->
-                        calculateRouteCapacities(mountainId, routes)
+            result.onSuccess { routes ->
+                // Load full mountain data
+                firestore.collection("mountains")
+                    .document(mountainId)
+                    .get()
+                    .addOnSuccessListener { document ->
+                        if (document.exists()) {
+                            val mountain = document.toObject(Mountain::class.java)?.copy(mountainId = document.id)
+                            _mountain.value = mountain
+
+                            // Build route capacities from REAL Firestore data
+                            buildRouteCapacities(routes)
+                        }
+                        _isLoading.value = false
                     }
-                }
-                _isLoading.value = false
-            }
-            .addOnFailureListener { e ->
+                    .addOnFailureListener { e ->
+                        _errorMessage.value = e.message
+                        _isLoading.value = false
+                    }
+            }.onFailure { e ->
                 _errorMessage.value = e.message
                 _isLoading.value = false
             }
+        }
+    }
+
+    /**
+     * Build route capacity display data from actual HikingRoute data (NOT hardcoded)
+     */
+    private fun buildRouteCapacities(routes: List<HikingRoute>) {
+        val capacities = routes.map { route ->
+            val percentage = if (route.maxCapacity > 0) {
+                (route.usedCapacity.toFloat() / route.maxCapacity * 100).toInt()
+            } else {
+                0
+            }
+
+            val status = when {
+                route.status == HikingRoute.STATUS_CLOSED -> "Closed"
+                route.isFull -> "Full"
+                percentage >= 90 -> "Almost Full"
+                percentage >= 70 -> "Limited Slots"
+                else -> "Available"
+            }
+
+            RouteCapacity(
+                routeId = route.routeId,
+                routeName = route.name,
+                currentCount = route.usedCapacity,
+                maxCapacity = route.maxCapacity,
+                percentage = percentage,
+                status = status,
+                routeStatus = route.status
+            )
+        }
+        _routeCapacities.value = capacities
     }
 
     private fun loadRegistrationStats(mountainId: String) {
@@ -108,38 +152,23 @@ class GunungAdminDashboardViewModel : ViewModel() {
             }
     }
 
-    private fun calculateRouteCapacities(mountainId: String, routes: List<HikingRoute>) {
-        val capacities = mutableListOf<RouteCapacity>()
-        val maxCapacity = 150 // Default max capacity per route
+    /**
+     * Update route status (open/closed)
+     */
+    fun updateRouteStatus(mountainId: String, routeId: String, newStatus: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
 
-        firestore.collection("registrations")
-            .whereEqualTo("mountainId", mountainId)
-            .get()
-            .addOnSuccessListener { documents ->
-                val registrations = documents.mapNotNull { doc ->
-                    doc.toObject(Registration::class.java)
-                }.filter { it.status == Registration.STATUS_APPROVED }
+            val result = capacityRepository.updateRouteStatus(mountainId, routeId, newStatus)
 
-                routes.forEach { route ->
-                    val routeRegistrations = registrations.count { it.route == route.name }
-                    val percentage = (routeRegistrations.toFloat() / maxCapacity * 100).toInt()
-                    val status = when {
-                        percentage >= 90 -> "Full"
-                        percentage >= 70 -> "Limited Slots"
-                        else -> "Available"
-                    }
-                    capacities.add(
-                        RouteCapacity(
-                            routeName = route.name,
-                            currentCount = routeRegistrations,
-                            maxCapacity = maxCapacity,
-                            percentage = percentage,
-                            status = status
-                        )
-                    )
-                }
-                _routeCapacities.value = capacities
+            result.onSuccess {
+                // Reload to get updated data
+                loadDashboardData(mountainId)
+            }.onFailure { e ->
+                _errorMessage.value = e.message
+                _isLoading.value = false
             }
+        }
     }
 
     fun clearError() {
@@ -148,10 +177,12 @@ class GunungAdminDashboardViewModel : ViewModel() {
 }
 
 data class RouteCapacity(
+    val routeId: String = "",
     val routeName: String,
     val currentCount: Int,
     val maxCapacity: Int,
     val percentage: Int,
-    val status: String
+    val status: String,
+    val routeStatus: String = HikingRoute.STATUS_OPEN
 )
 

@@ -7,7 +7,8 @@ data class Registration(
     val userId: String = "",
     val mountainId: String = "",
     val mountainName: String = "",
-    val route: String = "",
+    val routeId: String = "",  // NEW: Route ID for capacity tracking
+    val route: String = "",    // Route name for display
     val fullName: String = "",
     val dob: String = "",
     val address: String = "",
@@ -21,6 +22,7 @@ data class Registration(
         const val STATUS_PENDING = "PENDING"
         const val STATUS_APPROVED = "APPROVED"
         const val STATUS_REJECTED = "REJECTED"
+        const val STATUS_CANCELLED = "CANCELLED"
     }
 }
 

@@ -93,11 +93,15 @@ class MountainRepository {
                 "imageUrl" to newMountain.imageUrl,
                 "routes" to newMountain.routes.map { route ->
                     mapOf(
-                        "routeId" to route.routeId,
+                        "routeId" to route.routeId.ifEmpty { UUID.randomUUID().toString() },
                         "name" to route.name,
                         "difficulty" to route.difficulty,
                         "estimatedTime" to route.estimatedTime,
-                        "distance" to route.distance
+                        "distance" to route.distance,
+                        // Capacity fields - MUST be included
+                        "maxCapacity" to route.maxCapacity,
+                        "usedCapacity" to route.usedCapacity,
+                        "status" to route.status
                     )
                 },
                 "isActive" to newMountain.isActive,
@@ -131,11 +135,15 @@ class MountainRepository {
                 "imageUrl" to mountain.imageUrl,
                 "routes" to mountain.routes.map { route ->
                     mapOf(
-                        "routeId" to route.routeId,
+                        "routeId" to route.routeId.ifEmpty { UUID.randomUUID().toString() },
                         "name" to route.name,
                         "difficulty" to route.difficulty,
                         "estimatedTime" to route.estimatedTime,
-                        "distance" to route.distance
+                        "distance" to route.distance,
+                        // Capacity fields - MUST be included
+                        "maxCapacity" to route.maxCapacity,
+                        "usedCapacity" to route.usedCapacity,
+                        "status" to route.status
                     )
                 },
                 "isActive" to mountain.isActive

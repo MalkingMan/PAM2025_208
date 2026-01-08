@@ -32,6 +32,7 @@ class RoutesAdapter(
         fun bind(route: HikingRoute) {
             binding.tvRouteName.text = route.name
             binding.tvDifficulty.text = route.difficulty
+            binding.tvCapacity.text = "Capacity: ${route.maxCapacity}"
 
             binding.btnDelete.setOnClickListener {
                 onDeleteClick(route)

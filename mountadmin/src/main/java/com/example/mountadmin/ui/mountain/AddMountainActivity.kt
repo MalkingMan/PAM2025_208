@@ -95,17 +95,25 @@ class AddMountainActivity : AppCompatActivity() {
         dialogBinding.actvDifficulty.setAdapter(adapter)
         dialogBinding.actvDifficulty.setDropDownBackgroundResource(R.drawable.bg_dropdown_popup)
 
+        // Set default capacity
+        dialogBinding.etMaxCapacity.setText("100")
+
         MaterialAlertDialogBuilder(this, R.style.Theme_MountAdmin_AlertDialog)
             .setTitle(getString(R.string.add_route))
             .setView(dialogBinding.root)
             .setPositiveButton(getString(R.string.add_route)) { _, _ ->
                 val routeName = dialogBinding.etRouteName.text.toString().trim()
                 val difficulty = dialogBinding.actvDifficulty.text.toString()
+                val maxCapacity = dialogBinding.etMaxCapacity.text.toString().toIntOrNull() ?: 100
 
                 if (routeName.isNotEmpty() && difficulty.isNotEmpty()) {
                     val route = HikingRoute(
+                        routeId = java.util.UUID.randomUUID().toString(),
                         name = routeName,
-                        difficulty = difficulty
+                        difficulty = difficulty,
+                        maxCapacity = maxCapacity,
+                        usedCapacity = 0,
+                        status = HikingRoute.STATUS_OPEN
                     )
                     routes.add(route)
                     routesAdapter.submitList(routes.toList())
