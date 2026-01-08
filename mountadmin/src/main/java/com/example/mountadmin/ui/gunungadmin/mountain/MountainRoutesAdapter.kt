@@ -28,8 +28,12 @@ class MountainRoutesAdapter : ListAdapter<HikingRoute, MountainRoutesAdapter.Vie
 
         fun bind(item: HikingRoute) {
             binding.tvRouteName.text = item.name
-            binding.tvRouteDifficulty.text = "Difficulty: ${item.difficulty}"
-            binding.tvRouteDuration.text = "Duration: ${item.estimatedTime}"
+
+            val statusLabel = if (item.status == HikingRoute.STATUS_OPEN) "OPEN" else "CLOSED"
+            val capLabel = "${item.usedCapacity}/${item.maxCapacity}"
+
+            binding.tvRouteDifficulty.text = "${item.difficulty} • $statusLabel"
+            binding.tvRouteDuration.text = "Capacity: $capLabel"
         }
     }
 
@@ -43,4 +47,3 @@ class MountainRoutesAdapter : ListAdapter<HikingRoute, MountainRoutesAdapter.Vie
         }
     }
 }
-

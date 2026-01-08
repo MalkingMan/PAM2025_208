@@ -3,15 +3,23 @@ package com.example.mountadmin.ui.gunungadmin.mountain
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.mountadmin.data.model.HikingRoute
 import com.example.mountadmin.data.model.Mountain
+import com.example.mountadmin.data.repository.RouteCapacityRepository
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
 
 class GunungAdminMountainViewModel : ViewModel() {
 
     private val firestore = FirebaseFirestore.getInstance()
+    private val capacityRepository = RouteCapacityRepository()
 
     private val _mountain = MutableLiveData<Mountain?>()
     val mountain: LiveData<Mountain?> = _mountain
+
+    private val _routes = MutableLiveData<List<HikingRoute>>(emptyList())
+    val routes: LiveData<List<HikingRoute>> = _routes
 
     private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading
@@ -22,6 +30,7 @@ class GunungAdminMountainViewModel : ViewModel() {
     fun loadMountainData(mountainId: String) {
         _isLoading.value = true
 
+        // Load mountain core fields
         firestore.collection("mountains")
             .document(mountainId)
             .get()
@@ -32,7 +41,24 @@ class GunungAdminMountainViewModel : ViewModel() {
                 } else {
                     _errorMessage.value = "Mountain not found"
                 }
-                _isLoading.value = false
+
+                // Load routes with proper parsing (routes array maps)
+                viewModelScope.launch {
+                    val res = capacityRepository.getRoutesWithCapacity(mountainId)
+                    res.onSuccess { list ->
+                        _routes.value = list.map { r ->
+                            r.copy(
+                                maxCapacity = if (r.maxCapacity > 0) r.maxCapacity else 100,
+                                status = if (r.status.isNotBlank()) r.status else HikingRoute.STATUS_OPEN
+                            )
+                        }
+                    }.onFailure { e ->
+                        _routes.value = emptyList()
+                        _errorMessage.value = e.message
+                    }
+
+                    _isLoading.value = false
+                }
             }
             .addOnFailureListener { e ->
                 _errorMessage.value = e.message
@@ -44,4 +70,3 @@ class GunungAdminMountainViewModel : ViewModel() {
         _errorMessage.value = null
     }
 }
-

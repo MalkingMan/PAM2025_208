@@ -85,12 +85,12 @@ class GunungAdminMountainFragment : Fragment() {
                         .centerCrop()
                         .into(binding.ivMountainImage)
                 }
-
-                // Update routes
-                routesAdapter.submitList(it.routes)
-                binding.tvNoRoutes.visibility =
-                    if (it.routes.isEmpty()) View.VISIBLE else View.GONE
             }
+        }
+
+        viewModel.routes.observe(viewLifecycleOwner) { routes ->
+            routesAdapter.submitList(routes)
+            binding.tvNoRoutes.visibility = if (routes.isEmpty()) View.VISIBLE else View.GONE
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
