@@ -76,8 +76,8 @@ dependencies {
     implementation("de.hdodenhof:circleimageview:3.1.0")
 
     // Glide for image loading
-    implementation("com.github.bumptech.glide:glide:5.0.5")
-    kapt("com.github.bumptech.glide:compiler:5.0.5")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    kapt("com.github.bumptech.glide:compiler:4.16.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -4,96 +4,137 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
+    android:layout_marginBottom="14dp"
     app:cardBackgroundColor="@color/background_card"
-    app:cardCornerRadius="16dp"
+    app:cardCornerRadius="18dp"
     app:cardElevation="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:layout_height="wrap_content">
 
+        <!-- Hero image -->
         <ImageView
             android:id="@+id/ivMountain"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:background="@drawable/bg_card"
+            android:layout_width="0dp"
+            android:layout_height="160dp"
+            android:contentDescription="Mountain image"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_mountains"
-            android:padding="16dp"
-            app:tint="@color/primary"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:contentDescription="Mountain" />
+            tools:src="@drawable/ic_mountain_placeholder" />
 
+        <!-- Scrim gradient for readability -->
+        <View
+            android:id="@+id/viewScrim"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/bg_mountain_image_scrim"
+            app:layout_constraintBottom_toBottomOf="@id/ivMountain"
+            app:layout_constraintEnd_toEndOf="@id/ivMountain"
+            app:layout_constraintStart_toStartOf="@id/ivMountain"
+            app:layout_constraintTop_toTopOf="@id/ivMountain" />
+
+        <!-- Loading indicator over image -->
+        <ProgressBar
+            android:id="@+id/progressImage"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:indeterminateTint="@color/white"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/ivMountain"
+            app:layout_constraintEnd_toEndOf="@id/ivMountain"
+            app:layout_constraintStart_toStartOf="@id/ivMountain"
+            app:layout_constraintTop_toTopOf="@id/ivMountain" />
+
+        <!-- Text overlay -->
         <TextView
             android:id="@+id/tvName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginStart="14dp"
+            android:layout_marginEnd="14dp"
+            android:layout_marginBottom="10dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textColor="@color/text_primary"
-            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@+id/btnEdit"
-            app:layout_constraintStart_toEndOf="@+id/ivMountain"
-            app:layout_constraintTop_toTopOf="@+id/ivMountain"
-            tools:text="Mount Rinjani" />
+            app:layout_constraintBottom_toTopOf="@+id/tvLocation"
+            app:layout_constraintEnd_toStartOf="@+id/actionContainer"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/ivMountain"
+            app:layout_constraintVertical_bias="1"
+            tools:text="Gunung Merbabu" />
 
         <TextView
             android:id="@+id/tvLocation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginStart="14dp"
+            android:layout_marginEnd="14dp"
+            android:layout_marginBottom="12dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textColor="@color/text_secondary"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="@+id/tvName"
-            app:layout_constraintStart_toEndOf="@+id/ivMountain"
-            app:layout_constraintTop_toBottomOf="@+id/tvName"
-            tools:text="West Nusa Tenggara, Indonesia" />
+            android:textColor="#D6FFFFFF"
+            android:textSize="13sp"
+            app:layout_constraintBottom_toTopOf="@+id/chipElevation"
+            app:layout_constraintEnd_toStartOf="@+id/actionContainer"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="Jawa Tengah, Indonesia" />
 
-        <TextView
-            android:id="@+id/tvElevation"
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipElevation"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/bg_button_primary"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="4dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="14dp"
+            android:layout_marginBottom="14dp"
             android:textColor="@color/white"
             android:textSize="12sp"
-            app:layout_constraintStart_toEndOf="@+id/ivMountain"
-            app:layout_constraintTop_toBottomOf="@+id/tvLocation"
-            tools:text="3,726 m" />
+            app:chipBackgroundColor="@color/primary"
+            app:chipCornerRadius="16dp"
+            app:layout_constraintBottom_toBottomOf="@id/ivMountain"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="3145 m" />
 
-        <ImageButton
-            android:id="@+id/btnEdit"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Edit"
-            android:src="@drawable/ic_edit"
-            app:tint="@color/primary"
-            app:layout_constraintEnd_toStartOf="@+id/btnDelete"
-            app:layout_constraintTop_toTopOf="parent" />
+        <!-- Actions (edit/delete) -->
+        <LinearLayout
+            android:id="@+id/actionContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="@id/ivMountain"
+            app:layout_constraintEnd_toEndOf="@id/ivMountain">
 
-        <ImageButton
-            android:id="@+id/btnDelete"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Delete"
-            android:src="@drawable/ic_delete"
-            app:tint="@color/button_danger"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEdit"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:contentDescription="Edit"
+                app:icon="@drawable/ic_edit"
+                app:iconTint="@color/white"
+                app:iconSize="20dp"
+                app:backgroundTint="#3D444C"
+                app:cornerRadius="12dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDelete"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:contentDescription="Delete"
+                app:icon="@drawable/ic_delete"
+                app:iconTint="@color/white"
+                app:iconSize="20dp"
+                app:backgroundTint="#E05D5D"
+                app:cornerRadius="12dp" />
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

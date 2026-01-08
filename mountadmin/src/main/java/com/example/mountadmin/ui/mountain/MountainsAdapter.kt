@@ -1,10 +1,18 @@
 package com.example.mountadmin.ui.mountain
 
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
+import com.example.mountadmin.R
 import com.example.mountadmin.data.model.Mountain
 import com.example.mountadmin.databinding.ItemMountainAdminBinding
 
@@ -33,15 +41,59 @@ class MountainsAdapter(
         fun bind(mountain: Mountain) {
             binding.tvName.text = mountain.name
             binding.tvLocation.text = "${mountain.province}, ${mountain.country}"
-            binding.tvElevation.text = "${mountain.elevation}m"
+            binding.chipElevation.text = "${mountain.elevation} m"
 
-            binding.btnEdit.setOnClickListener {
-                onEditClick(mountain)
+            // Image loading rules: HTTPS only from Firestore
+            val url = mountain.imageUrl.trim()
+            Log.d("MountainsAdapter", "mountain=${mountain.id} url=${url.take(80)}")
+
+            binding.progressImage.visibility = View.GONE
+
+            if (url.isBlank()) {
+                binding.ivMountain.setImageResource(R.drawable.ic_mountain_placeholder)
+                return
             }
 
-            binding.btnDelete.setOnClickListener {
-                onDeleteClick(mountain)
+            if (!url.startsWith("https://")) {
+                Log.w("MountainsAdapter", "Non-https imageUrl blocked for mountain=${mountain.id}")
+                binding.ivMountain.setImageResource(R.drawable.ic_mountain_placeholder)
+                return
             }
+
+            binding.progressImage.visibility = View.VISIBLE
+
+            Glide.with(binding.root)
+                .load(url)
+                .placeholder(R.drawable.ic_mountain_placeholder)
+                .error(R.drawable.ic_mountain_placeholder)
+                .centerCrop()
+                .listener(object : RequestListener<android.graphics.drawable.Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<android.graphics.drawable.Drawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        Log.e("MountainsAdapter", "Glide load failed mountain=${mountain.id} url=$url", e)
+                        binding.progressImage.visibility = View.GONE
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: android.graphics.drawable.Drawable?,
+                        model: Any?,
+                        target: Target<android.graphics.drawable.Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        binding.progressImage.visibility = View.GONE
+                        return false
+                    }
+                })
+                .into(binding.ivMountain)
+
+            binding.btnEdit.setOnClickListener { onEditClick(mountain) }
+            binding.btnDelete.setOnClickListener { onDeleteClick(mountain) }
         }
     }
 
@@ -55,4 +107,3 @@ class MountainsAdapter(
         }
     }
 }
-
