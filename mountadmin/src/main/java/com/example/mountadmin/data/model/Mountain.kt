@@ -34,7 +34,7 @@ data class HikingRoute(
     val estimatedTime: String = "",
     val distance: String = "",
     // Capacity fields - NEW
-    val maxCapacity: Int = 0,
+    val maxCapacity: Int = 100,
     val usedCapacity: Int = 0,
     val status: String = STATUS_OPEN
 ) {
@@ -60,4 +60,3 @@ data class HikingRoute(
         const val STATUS_CLOSED = "closed"
     }
 }
-

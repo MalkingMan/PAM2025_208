@@ -179,4 +179,5 @@
     <string name="success_approved">Registration approved successfully</string>
     <string name="success_rejected">Registration rejected successfully</string>
     <string name="profile">Profile</string>
+    <string name="edit_route">Edit Route</string>
 </resources>

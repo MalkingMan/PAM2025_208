@@ -9,7 +9,8 @@ import com.example.mountadmin.data.model.HikingRoute
 import com.example.mountadmin.databinding.ItemRouteBinding
 
 class RoutesAdapter(
-    private val onDeleteClick: (HikingRoute) -> Unit
+    private val onDeleteClick: (HikingRoute) -> Unit,
+    private val onEditClick: ((HikingRoute) -> Unit)? = null
 ) : ListAdapter<HikingRoute, RoutesAdapter.RouteViewHolder>(RouteDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RouteViewHolder {
@@ -37,12 +38,16 @@ class RoutesAdapter(
             binding.btnDelete.setOnClickListener {
                 onDeleteClick(route)
             }
+
+            binding.root.setOnClickListener {
+                onEditClick?.invoke(route)
+            }
         }
     }
 
     class RouteDiffCallback : DiffUtil.ItemCallback<HikingRoute>() {
         override fun areItemsTheSame(oldItem: HikingRoute, newItem: HikingRoute): Boolean {
-            return oldItem.name == newItem.name
+            return oldItem.routeId.isNotEmpty() && oldItem.routeId == newItem.routeId || oldItem.name == newItem.name
         }
 
         override fun areContentsTheSame(oldItem: HikingRoute, newItem: HikingRoute): Boolean {
@@ -50,4 +55,3 @@ class RoutesAdapter(
         }
     }
 }
-

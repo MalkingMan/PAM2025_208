@@ -30,6 +30,7 @@ class EditMountainActivity : AppCompatActivity() {
     private var mountainId: String = ""
     private var currentMountain: Mountain? = null
     private var selectedImageUri: Uri? = null
+    private var editingRouteIndex: Int? = null
 
     private val imagePickerLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
@@ -67,11 +68,23 @@ class EditMountainActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        routesAdapter = RoutesAdapter { route ->
-            routes.remove(route)
-            routesAdapter.submitList(routes.toList())
-            updateRoutesVisibility()
-        }
+        routesAdapter = RoutesAdapter(
+            onDeleteClick = { route ->
+                routes.remove(route)
+                routesAdapter.submitList(routes.toList())
+                updateRoutesVisibility()
+            },
+            onEditClick = { route ->
+                val index = routes.indexOfFirst { it.routeId == route.routeId && route.routeId.isNotEmpty() }
+                    .takeIf { it >= 0 }
+                    ?: routes.indexOf(route)
+
+                if (index >= 0) {
+                    editingRouteIndex = index
+                    showAddRouteDialog(routes[index])
+                }
+            }
+        )
 
         binding.rvRoutes.layoutManager = LinearLayoutManager(this)
         binding.rvRoutes.adapter = routesAdapter
@@ -111,7 +124,7 @@ class EditMountainActivity : AppCompatActivity() {
         binding.layoutUploadPlaceholder.gone()
     }
 
-    private fun showAddRouteDialog() {
+    private fun showAddRouteDialog(existingRoute: HikingRoute? = null) {
         val dialogBinding = DialogAddRouteBinding.inflate(LayoutInflater.from(this))
 
         val difficulties = listOf("Easy", "Moderate", "Hard", "Expert")
@@ -119,24 +132,48 @@ class EditMountainActivity : AppCompatActivity() {
         dialogBinding.actvDifficulty.setAdapter(adapter)
         dialogBinding.actvDifficulty.setDropDownBackgroundResource(R.drawable.bg_dropdown_popup)
 
+        val isEdit = existingRoute != null
+        dialogBinding.etRouteName.setText(existingRoute?.name.orEmpty())
+        dialogBinding.actvDifficulty.setText(existingRoute?.difficulty.orEmpty(), false)
+        dialogBinding.etMaxCapacity.setText((existingRoute?.maxCapacity ?: 100).toString())
+
         MaterialAlertDialogBuilder(this, R.style.Theme_MountAdmin_AlertDialog)
-            .setTitle(getString(R.string.add_route))
+            .setTitle(if (isEdit) "Edit Route" else getString(R.string.add_route))
             .setView(dialogBinding.root)
-            .setPositiveButton(getString(R.string.add_route)) { _, _ ->
+            .setPositiveButton(if (isEdit) "Save Changes" else getString(R.string.add_route)) { _, _ ->
                 val routeName = dialogBinding.etRouteName.text.toString().trim()
                 val difficulty = dialogBinding.actvDifficulty.text.toString()
+                val maxCapacity = dialogBinding.etMaxCapacity.text.toString().toIntOrNull() ?: 0
 
                 if (routeName.isNotEmpty() && difficulty.isNotEmpty()) {
                     val route = HikingRoute(
+                        routeId = existingRoute?.routeId?.takeIf { it.isNotBlank() }
+                            ?: java.util.UUID.randomUUID().toString(),
                         name = routeName,
-                        difficulty = difficulty
+                        difficulty = difficulty,
+                        maxCapacity = maxCapacity,
+                        usedCapacity = existingRoute?.usedCapacity ?: 0,
+                        status = existingRoute?.status ?: HikingRoute.STATUS_OPEN,
+                        estimatedTime = existingRoute?.estimatedTime.orEmpty(),
+                        distance = existingRoute?.distance.orEmpty()
                     )
-                    routes.add(route)
+
+                    if (isEdit) {
+                        val index = editingRouteIndex ?: routes.indexOfFirst { it.routeId == route.routeId }
+                        if (index >= 0) {
+                            routes[index] = route
+                        }
+                        editingRouteIndex = null
+                    } else {
+                        routes.add(route)
+                    }
                     routesAdapter.submitList(routes.toList())
                     updateRoutesVisibility()
                 }
             }
-            .setNegativeButton(android.R.string.cancel, null)
+            .setNegativeButton(android.R.string.cancel) { _, _ ->
+                editingRouteIndex = null
+            }
             .show()
     }
 
@@ -153,7 +190,18 @@ class EditMountainActivity : AppCompatActivity() {
     private fun populateMountainData(mountain: Mountain) {
         currentMountain = mountain
         routes.clear()
-        routes.addAll(mountain.routes)
+
+        // Migration: ensure routeId and capacity fields are present for old data
+        val migratedRoutes = mountain.routes.map { r ->
+            val routeId = r.routeId.takeIf { it.isNotBlank() } ?: java.util.UUID.randomUUID().toString()
+            r.copy(
+                routeId = routeId,
+                maxCapacity = if (r.maxCapacity > 0) r.maxCapacity else 100,
+                status = if (r.status.isNotBlank()) r.status else HikingRoute.STATUS_OPEN
+            )
+        }
+
+        routes.addAll(migratedRoutes)
 
         binding.etName.setText(mountain.name)
         binding.etProvince.setText(mountain.province)

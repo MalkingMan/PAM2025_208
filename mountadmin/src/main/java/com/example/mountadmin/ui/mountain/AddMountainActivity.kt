@@ -47,11 +47,13 @@ class AddMountainActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        routesAdapter = RoutesAdapter { route ->
-            routes.remove(route)
-            routesAdapter.submitList(routes.toList())
-            updateRoutesVisibility()
-        }
+        routesAdapter = RoutesAdapter(
+            onDeleteClick = { route ->
+                routes.remove(route)
+                routesAdapter.submitList(routes.toList())
+                updateRoutesVisibility()
+            }
+        )
 
         binding.rvRoutes.layoutManager = LinearLayoutManager(this)
         binding.rvRoutes.adapter = routesAdapter
@@ -104,7 +106,7 @@ class AddMountainActivity : AppCompatActivity() {
             .setPositiveButton(getString(R.string.add_route)) { _, _ ->
                 val routeName = dialogBinding.etRouteName.text.toString().trim()
                 val difficulty = dialogBinding.actvDifficulty.text.toString()
-                val maxCapacity = dialogBinding.etMaxCapacity.text.toString().toIntOrNull() ?: 100
+                val maxCapacity = dialogBinding.etMaxCapacity.text.toString().toIntOrNull()?.takeIf { it > 0 } ?: 100
 
                 if (routeName.isNotEmpty() && difficulty.isNotEmpty()) {
                     val route = HikingRoute(
