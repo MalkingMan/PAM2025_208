@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
 import com.example.mounttrack.R
 import com.example.mounttrack.databinding.ActivityNewsDetailBinding
 import com.google.firebase.Timestamp
@@ -101,8 +102,26 @@ class NewsDetailActivity : AppCompatActivity() {
             binding.tvTags.visibility = View.GONE
         }
 
-        // Cover image placeholder (can be enhanced with image loading library)
-        binding.ivCover.setImageResource(R.drawable.placeholder_mountain)
+        // Cover image (Base64 or URL)
+        val value = news.coverImageUrl
+        Log.d(TAG, "CoverImage len=${value.length} id=${news.actualId}")
+        if (com.example.mounttrack.utils.ImageDecodeUtils.isLikelyBase64Image(value)) {
+            val bmp = com.example.mounttrack.utils.ImageDecodeUtils.decodeBase64ToBitmap(value)
+            if (bmp != null) {
+                binding.ivCover.setImageBitmap(bmp)
+            } else {
+                binding.ivCover.setImageResource(R.drawable.placeholder_mountain)
+            }
+        } else if (value.isNotBlank()) {
+            Glide.with(this)
+                .load(value)
+                .placeholder(R.drawable.placeholder_mountain)
+                .error(R.drawable.placeholder_mountain)
+                .centerCrop()
+                .into(binding.ivCover)
+        } else {
+            binding.ivCover.setImageResource(R.drawable.placeholder_mountain)
+        }
     }
 
     private fun getCategoryColor(category: String): Int {
@@ -132,4 +151,3 @@ class NewsDetailActivity : AppCompatActivity() {
         Log.e(TAG, "Error: $message")
     }
 }
-

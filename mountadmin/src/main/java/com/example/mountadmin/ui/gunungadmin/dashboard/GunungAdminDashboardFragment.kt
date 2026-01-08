@@ -9,10 +9,10 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bumptech.glide.Glide
 import com.example.mountadmin.R
 import com.example.mountadmin.databinding.FragmentGunungAdminDashboardBinding
 import com.example.mountadmin.ui.gunungadmin.mountain.GunungAdminMountainFragment
+import com.example.mountadmin.utils.ImageDisplayUtils
 import com.example.mountadmin.utils.gone
 import com.example.mountadmin.utils.visible
 import com.github.mikephil.charting.components.XAxis
@@ -177,15 +177,12 @@ class GunungAdminDashboardFragment : Fragment() {
                 )
                 binding.tvDashboardTitle.text = "Dashboard – ${it.name}"
 
-                // Load mountain image
-                if (it.imageUrl.isNotEmpty()) {
-                    Glide.with(this)
-                        .load(it.imageUrl)
-                        .placeholder(R.drawable.ic_mountain_placeholder)
-                        .error(R.drawable.ic_mountain_placeholder)
-                        .centerCrop()
-                        .into(binding.ivMountainImage)
-                }
+                // Load mountain image (Base64 or URL)
+                ImageDisplayUtils.loadInto(
+                    binding.ivMountainImage,
+                    it.imageUrl,
+                    R.drawable.ic_mountain_placeholder
+                )
             }
         }
 

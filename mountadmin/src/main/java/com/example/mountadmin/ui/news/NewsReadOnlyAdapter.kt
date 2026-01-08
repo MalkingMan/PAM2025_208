@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mountadmin.R
 import com.example.mountadmin.data.model.News
 import com.example.mountadmin.databinding.ItemNewsReadOnlyBinding
+import com.example.mountadmin.utils.ImageDisplayUtils
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -45,13 +46,12 @@ class NewsReadOnlyAdapter(
             }
             binding.tvDate.text = formattedDate
 
-            // Load cover image or show placeholder
-            if (news.coverImageUrl.isNotEmpty()) {
-                // Use Glide or Coil to load image
-                binding.ivCover.setImageResource(R.drawable.ic_mountain_placeholder)
-            } else {
-                binding.ivCover.setImageResource(R.drawable.ic_mountain_placeholder)
-            }
+            // Load cover image (Base64 or URL)
+            ImageDisplayUtils.loadInto(
+                binding.ivCover,
+                news.coverImageUrl,
+                R.drawable.ic_mountain_placeholder
+            )
 
             binding.root.setOnClickListener {
                 onItemClick(news)
@@ -73,4 +73,3 @@ class NewsReadOnlyAdapter(
         }
     }
 }
-

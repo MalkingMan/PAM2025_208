@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mountadmin.R
 import com.example.mountadmin.data.model.News
 import com.example.mountadmin.databinding.ItemNewsAdminBinding
+import com.example.mountadmin.utils.ImageDisplayUtils
 
 class NewsAdapter(
     private val onEditClick: (News) -> Unit,
@@ -35,6 +36,13 @@ class NewsAdapter(
         fun bind(news: News) {
             binding.tvTitle.text = news.title
             binding.tvCategory.text = news.category
+
+            // Load cover thumbnail if ImageView exists in layout
+            // (safe: only if viewBinding has ivCover/ivThumbnail field)
+            runCatching {
+                val iv = binding.root.findViewById<android.widget.ImageView>(R.id.ivThumbnail)
+                ImageDisplayUtils.loadInto(iv, news.coverImageUrl, R.drawable.ic_mountain_placeholder)
+            }
 
             // Status badge
             val isPublished = news.status == News.STATUS_PUBLISHED
@@ -66,4 +74,3 @@ class NewsAdapter(
         }
     }
 }
-

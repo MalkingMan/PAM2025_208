@@ -1,5 +1,6 @@
 package com.example.mounttrack.ui.news
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,8 +9,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.mounttrack.R
 import com.example.mounttrack.data.model.HikingNews
+import com.example.mounttrack.utils.ImageDecodeUtils
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -42,6 +46,28 @@ class NewsListAdapter(
             tvNewsTitle.text = news.title
             tvNewsDescription.text = news.description
             tvNewsTime.text = formatTimeAgo(news.createdAt)
+
+            val imageValue = news.coverImageUrl
+            Log.d("NewsListAdapter", "Loading news image len=${imageValue.length} id=${news.actualId}")
+
+            if (ImageDecodeUtils.isLikelyBase64Image(imageValue)) {
+                val bitmap = ImageDecodeUtils.decodeBase64ToBitmap(imageValue)
+                if (bitmap != null) {
+                    ivNewsThumbnail.setImageBitmap(bitmap)
+                } else {
+                    ivNewsThumbnail.setImageResource(R.drawable.placeholder_mountain)
+                }
+            } else if (imageValue.isNotBlank()) {
+                Glide.with(itemView.context)
+                    .load(imageValue)
+                    .placeholder(R.drawable.placeholder_mountain)
+                    .error(R.drawable.placeholder_mountain)
+                    .centerCrop()
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(ivNewsThumbnail)
+            } else {
+                ivNewsThumbnail.setImageResource(R.drawable.placeholder_mountain)
+            }
 
             // Set category badge color
             val categoryColor = getCategoryColor(news.category)
@@ -95,4 +121,3 @@ class NewsListAdapter(
         }
     }
 }
-

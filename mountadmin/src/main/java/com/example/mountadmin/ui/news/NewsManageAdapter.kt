@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mountadmin.R
 import com.example.mountadmin.data.model.News
 import com.example.mountadmin.databinding.ItemNewsManageBinding
+import com.example.mountadmin.utils.ImageDisplayUtils
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -52,12 +53,12 @@ class NewsManageAdapter(
             // Author
             binding.tvAuthor.text = news.authorName.ifEmpty { "Admin Berita" }
 
-            // Load thumbnail or show placeholder
-            if (news.coverImageUrl.isNotEmpty()) {
-                binding.ivThumbnail.setImageResource(R.drawable.ic_mountain_placeholder)
-            } else {
-                binding.ivThumbnail.setImageResource(R.drawable.ic_mountain_placeholder)
-            }
+            // Load cover image (Base64 or URL)
+            ImageDisplayUtils.loadInto(
+                binding.ivThumbnail,
+                news.coverImageUrl,
+                R.drawable.ic_mountain_placeholder
+            )
 
             binding.btnEdit.setOnClickListener {
                 onEditClick(news)
@@ -79,4 +80,3 @@ class NewsManageAdapter(
         }
     }
 }
-

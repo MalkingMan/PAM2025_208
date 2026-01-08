@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bumptech.glide.Glide
 import com.example.mountadmin.R
 import com.example.mountadmin.databinding.FragmentGunungAdminMountainBinding
+import com.example.mountadmin.utils.ImageDisplayUtils
 import com.google.android.material.snackbar.Snackbar
 
 class GunungAdminMountainFragment : Fragment() {
@@ -76,15 +76,12 @@ class GunungAdminMountainFragment : Fragment() {
                 binding.tvMountainLocation.text = it.location
                 binding.tvMountainDescription.text = it.description
 
-                // Load mountain image
-                if (it.imageUrl.isNotEmpty()) {
-                    Glide.with(this)
-                        .load(it.imageUrl)
-                        .placeholder(R.drawable.ic_mountain_placeholder)
-                        .error(R.drawable.ic_mountain_placeholder)
-                        .centerCrop()
-                        .into(binding.ivMountainImage)
-                }
+                // Load mountain image (Base64 or URL)
+                ImageDisplayUtils.loadInto(
+                    binding.ivMountainImage,
+                    it.imageUrl,
+                    R.drawable.ic_mountain_placeholder
+                )
             }
         }
 
