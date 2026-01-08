@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary Colors -->
+    <color name="primary">#4DB6AC</color>
+    <color name="primary_dark">#00897B</color>
+    <color name="primary_light">#80CBC4</color>
+    <color name="accent">#4DB6AC</color>
+
+    <!-- Background Colors -->
+    <color name="background_dark">#121212</color>
+    <color name="background_card">#1E1E1E</color>
+    <color name="background_card_light">#2D2D2D</color>
+    <color name="surface">#1E1E1E</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B3B3B3</color>
+    <color name="text_hint">#757575</color>
+
+    <!-- Status Colors -->
+    <color name="status_pending">#FFC107</color>
+    <color name="status_pending_bg">#33FFC107</color>
+    <color name="status_approved">#4CAF50</color>
+    <color name="status_approved_bg">#334CAF50</color>
+    <color name="status_rejected">#F44336</color>
+    <color name="status_rejected_bg">#33F44336</color>
+
+    <!-- Input Field Colors -->
+    <color name="input_background">#2D2D2D</color>
+    <color name="input_stroke">#424242</color>
+
+    <!-- Other Colors -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="divider">#424242</color>
+    <color name="logout_red">#EF5350</color>
+
+    <!-- Difficulty Level Colors -->
+    <color name="difficulty_easy">#4CAF50</color>
+    <color name="difficulty_moderate">#FFC107</color>
+    <color name="difficulty_hard">#FF9800</color>
+    <color name="difficulty_expert">#F44336</color>
+</resources>

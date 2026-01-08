@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MountAdmin</string>
+    <string name="app_subtitle">Admin Portal</string>
+
+    <!-- Auth -->
+    <string name="email">Email Address</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="login">Login</string>
+    <string name="logout">Logout</string>
+    <string name="enter_email">Enter your email</string>
+    <string name="enter_password">Enter your password</string>
+    <string name="admin_portal">MountTrack Admin Portal</string>
+    <string name="sign_in_continue">Sign in to continue to admin dashboard</string>
+
+    <!-- Navigation -->
+    <string name="home">Home</string>
+    <string name="mountains">Mountains</string>
+    <string name="admin">Admin</string>
+    <string name="news">News</string>
+    <string name="settings">Settings</string>
+
+    <!-- Dashboard -->
+    <string name="national_dashboard">National Dashboard</string>
+    <string name="national_summary">National Summary</string>
+    <string name="total_registered_hikers">Total Registered Hikers</string>
+    <string name="registered_this_month">Registered This Month</string>
+    <string name="most_climbed_mountain">Most Climbed Mountain</string>
+    <string name="hiking_registrations_by_mountain">Hiking Registrations by Mountain</string>
+    <string name="last_30_days">Last 30 days</string>
+
+    <!-- Manage Admins -->
+    <string name="manage_administrators">Manage Administrators</string>
+    <string name="add_new_admin">Add New Admin</string>
+    <string name="edit_admin">Edit Admin</string>
+    <string name="create_admin">Create Admin</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="remove_admin">Remove Admin</string>
+    <string name="all">All</string>
+    <string name="mountain_admins">Mountain Admins</string>
+    <string name="news_admins">News Admins</string>
+    <string name="create_new_admin">Create a new administrator account</string>
+    <string name="modify_admin">Modify administrator details</string>
+
+    <!-- Admin Form -->
+    <string name="full_name">Full Name</string>
+    <string name="enter_full_name">Enter the full name</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="enter_phone_number">Enter the phone number</string>
+    <string name="enter_email_address">Enter the email address</string>
+    <string name="enter_secure_password">Enter a secure password</string>
+    <string name="confirm_the_password">Confirm the password</string>
+    <string name="select_admin_role">Select Admin Role</string>
+    <string name="select_assigned_mountain">Select Assigned Mountain</string>
+    <string name="admin_role">Admin Role</string>
+    <string name="assigned_mountain">Assigned Mountain</string>
+    <string name="status">Status</string>
+    <string name="active">Active</string>
+    <string name="disabled">Disabled</string>
+
+    <!-- Roles -->
+    <string name="super_admin">Super Admin</string>
+    <string name="mountain_admin">Mountain Admin</string>
+    <string name="news_admin">News Admin</string>
+
+    <!-- Manage Mountains -->
+    <string name="manage_mountain_data">Manage Mountain Data</string>
+    <string name="add_mountain">Add Mountain</string>
+    <string name="edit_mountain">Edit Mountain</string>
+    <string name="save_mountain">Save Mountain</string>
+    <string name="delete_mountain">Delete Mountain</string>
+    <string name="mountain_name">Mountain Name</string>
+    <string name="province">Province</string>
+    <string name="country">Country</string>
+    <string name="elevation">Elevation (meters)</string>
+    <string name="description">Description</string>
+    <string name="describe_mountain">Describe the mountain...</string>
+    <string name="mountain_basic_info">Mountain Basic Information</string>
+    <string name="upload_mountain_photo">Upload Mountain Photo</string>
+    <string name="tap_to_select_image">Tap to select an image from your gallery</string>
+
+    <!-- Hiking Routes -->
+    <string name="hiking_routes">Hiking Routes</string>
+    <string name="add_route">Add Route</string>
+    <string name="route_name">Route Name</string>
+    <string name="difficulty">Difficulty</string>
+    <string name="no_routes_added">No hiking routes added yet.</string>
+
+    <!-- Manage News -->
+    <string name="manage_news_articles">Manage News Articles</string>
+    <string name="add_new_article">Add New Article</string>
+    <string name="edit_article">Edit Article</string>
+    <string name="publish_article">Publish Article</string>
+    <string name="save_as_draft">Save as Draft</string>
+    <string name="delete_article">Delete Article</string>
+    <string name="create_publish_article">Create and publish a new news article</string>
+    <string name="cover_image">Cover Image</string>
+    <string name="upload_image">Upload Image</string>
+    <string name="image_hint">PNG, JPG, GIF up to 10MB</string>
+    <string name="article_title">Article Title</string>
+    <string name="enter_article_title">Enter article title</string>
+    <string name="category">Category</string>
+    <string name="select_category">Select Category</string>
+    <string name="article_content">Article Content</string>
+    <string name="write_content">Write your article content here...</string>
+    <string name="tags_optional">Hashtag (Optional)</string>
+    <string name="add_tags">Add hashtags (optional)</string>
+    <string name="published">Published</string>
+    <string name="draft">Draft</string>
+
+    <!-- Settings -->
+    <string name="manage_account">Manage your account</string>
+    <string name="edit_profile">Edit Profile</string>
+
+    <!-- Search -->
+    <string name="search">Search</string>
+    <string name="search_mountains">Search mountains...</string>
+    <string name="search_admins">Search admins...</string>
+    <string name="search_articles">Search articles...</string>
+
+    <!-- Errors -->
+    <string name="error_empty_email">Email is required</string>
+    <string name="error_invalid_email">Invalid email format</string>
+    <string name="error_empty_password">Password is required</string>
+    <string name="error_password_short">Password must be at least 6 characters</string>
+    <string name="error_passwords_not_match">Passwords do not match</string>
+    <string name="error_empty_name">Full name is required</string>
+    <string name="error_login_failed">Login failed. Please check your credentials.</string>
+    <string name="error_not_admin">You are not authorized to access admin portal</string>
+    <string name="error_account_disabled">Your account has been disabled</string>
+    <string name="error_select_role">Please select a role</string>
+    <string name="error_select_mountain">Please select a mountain for Mountain Admin</string>
+    <string name="error_generic">Something went wrong. Please try again.</string>
+
+    <!-- Success -->
+    <string name="success_admin_created">Admin created successfully</string>
+    <string name="success_admin_updated">Admin updated successfully</string>
+    <string name="success_admin_deleted">Admin deleted successfully</string>
+    <string name="success_mountain_saved">Mountain saved successfully</string>
+    <string name="success_mountain_deleted">Mountain deleted successfully</string>
+    <string name="success_article_published">Article published successfully</string>
+    <string name="success_article_saved">Article saved as draft</string>
+    <string name="success_logout">Logged out successfully</string>
+
+    <!-- Confirmations -->
+    <string name="confirm_delete_admin">Are you sure you want to delete this admin?</string>
+    <string name="confirm_delete_mountain">Are you sure you want to delete this mountain?</string>
+    <string name="confirm_delete_article">Are you sure you want to delete this article?</string>
+    <string name="confirm_logout">Are you sure you want to logout?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="cancel">Cancel</string>
+    <string name="change">Change</string>
+
+    <!-- Gunung Admin -->
+    <string name="admin_dashboard">Admin Dashboard</string>
+    <string name="registrations">Registrations</string>
+    <string name="manage_registrations">Manage hike applications for this mountain</string>
+    <string name="pending">Pending</string>
+    <string name="approved">Approved</string>
+    <string name="rejected">Rejected</string>
+    <string name="view_id_card">View ID Card</string>
+    <string name="approve">Approve</string>
+    <string name="reject">Reject</string>
+    <string name="view_mountain_details">View Mountain Details</string>
+    <string name="view_all_registrations">View All Registrations</string>
+    <string name="quick_statistics">Quick Statistics</string>
+    <string name="total_registrations">Total Registrations</string>
+    <string name="pending_review">Pending Review</string>
+    <string name="approved_hikers">Approved Hikers</string>
+    <string name="route_capacity">Route Capacity</string>
+    <string name="recent_registrations">Recent Registrations</string>
+    <string name="view_all">View All</string>
+    <string name="no_registrations">No registrations found</string>
+    <string name="no_recent_registrations">No recent registrations</string>
+    <string name="confirm_approve">Are you sure you want to approve this registration?</string>
+    <string name="confirm_reject">Are you sure you want to reject this registration?</string>
+    <string name="success_approved">Registration approved successfully</string>
+    <string name="success_rejected">Registration rejected successfully</string>
+    <string name="profile">Profile</string>
+</resources>

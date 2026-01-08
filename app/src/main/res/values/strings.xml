@@ -1,0 +1,102 @@
+<resources>
+    <string name="app_name">MountTrack</string>
+    <string name="app_subtitle">National Hiking Registration</string>
+
+    <!-- Auth -->
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="login">Login</string>
+    <string name="login_with_google">Login with Google</string>
+    <string name="signup_with_google">Sign up with Google</string>
+    <string name="register">Register</string>
+    <string name="logout">Logout</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="dont_have_account">Don\'t have an account?</string>
+    <string name="already_have_account">Already have an account?</string>
+    <string name="create_account">Create Account</string>
+    <string name="start_hiking_journey">Start your hiking journey</string>
+    <string name="enter_email">Enter your email</string>
+    <string name="enter_password">Enter your password</string>
+    <string name="confirm_your_password">Confirm your password</string>
+    <string name="terms_conditions">Terms &amp; Conditions</string>
+    <string name="agree_terms">I agree to the</string>
+
+    <!-- User Profile -->
+    <string name="full_name">Full Name</string>
+    <string name="enter_full_name">Enter your full name</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="enter_phone_number">Enter your phone number</string>
+    <string name="date_of_birth">Date of Birth</string>
+    <string name="select_date_of_birth">Select your date of birth</string>
+    <string name="address">Address</string>
+    <string name="enter_address">Enter your full address</string>
+
+    <!-- Navigation -->
+    <string name="home">Home</string>
+    <string name="mountains">Mountains</string>
+    <string name="news">News</string>
+    <string name="status">Status</string>
+    <string name="settings">Settings</string>
+
+    <!-- Dashboard -->
+    <string name="popular_mountains">Popular Mountains</string>
+    <string name="latest_hiking_news">Latest Hiking News</string>
+
+    <!-- Mountains -->
+    <string name="mountain_list">Mountain List</string>
+    <string name="explore_mountains">Explore and register for hiking</string>
+    <string name="height_format">%,d mdpl</string>
+
+    <!-- Registration -->
+    <string name="mountain_registration">Mountain Registration</string>
+    <string name="choose_hiking_route">Choose Hiking Route</string>
+    <string name="select_route">Select a route</string>
+    <string name="upload_id_card">Upload ID Card (KTP)</string>
+    <string name="tap_to_upload">Tap to upload your ID card</string>
+    <string name="upload_hint">JPG or PNG, max 5MB</string>
+    <string name="id_card_uploaded">ID Card uploaded</string>
+    <string name="tap_to_change">Tap to change</string>
+    <string name="id_card_uploaded_success">ID Card uploaded successfully</string>
+    <string name="register_now">Register Now</string>
+    <string name="cancel">Cancel</string>
+    <string name="registration_info">Your information will be used for official hiking verification.</string>
+
+    <!-- Status -->
+    <string name="registration_status">Registration Status</string>
+    <string name="current_registration">Current Registration</string>
+    <string name="previous_applications">Previous Applications</string>
+    <string name="pending">Pending</string>
+    <string name="approved">Approved</string>
+    <string name="rejected">Rejected</string>
+    <string name="registration_id">ID: %s</string>
+    <string name="via_route">via %s</string>
+    <string name="no_registrations">No registrations yet</string>
+
+    <!-- Settings -->
+    <string name="manage_account">Manage your account</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="update_profile">Update Profile</string>
+    <string name="profile_updated">Profile updated successfully</string>
+
+    <!-- Errors -->
+    <string name="error_empty_email">Email is required</string>
+    <string name="error_invalid_email">Invalid email format</string>
+    <string name="error_empty_password">Password is required</string>
+    <string name="error_password_short">Password must be at least 6 characters</string>
+    <string name="error_passwords_not_match">Passwords do not match</string>
+    <string name="error_empty_name">Full name is required</string>
+    <string name="error_terms_not_accepted">You must accept the Terms &amp; Conditions</string>
+    <string name="error_login_failed">Login failed. Please check your credentials.</string>
+    <string name="error_registration_failed">Registration failed. Please try again.</string>
+    <string name="error_generic">Something went wrong. Please try again.</string>
+    <string name="error_empty_phone">Phone number is required</string>
+    <string name="error_empty_dob">Date of birth is required</string>
+    <string name="error_empty_address">Address is required</string>
+    <string name="error_select_route">Please select a hiking route</string>
+    <string name="error_upload_id">Please upload your ID card</string>
+
+    <!-- Success -->
+    <string name="success_registration">Registration submitted successfully!</string>
+    <string name="success_logout">Logged out successfully</string>
+</resources>

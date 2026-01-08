@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary Colors -->
+    <color name="primary">#22C7A9</color>
+    <color name="primary_dark">#00897B</color>
+    <color name="primary_light">#80CBC4</color>
+    <color name="accent">#22C7A9</color>
+
+    <!-- Background Colors -->
+    <color name="background_dark">#1F2428</color>
+    <color name="background_card">#2B3137</color>
+    <color name="background_card_light">#363D44</color>
+    <color name="surface">#2B3137</color>
+    <color name="card_background">#2B3137</color>
+
+    <!-- Gunung Admin Specific -->
+    <color name="gunung_bg_primary">#1F2428</color>
+    <color name="gunung_bg_secondary">#22272B</color>
+    <color name="gunung_card">#2B3137</color>
+    <color name="gunung_accent">#22C7A9</color>
+    <color name="gunung_success">#2ECC71</color>
+    <color name="gunung_error">#E05D5D</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B3B3B3</color>
+    <color name="text_hint">#757575</color>
+
+    <!-- Status Colors -->
+    <color name="status_active">#4CAF50</color>
+    <color name="status_active_bg">#334CAF50</color>
+    <color name="status_disabled">#F44336</color>
+    <color name="status_disabled_bg">#33F44336</color>
+    <color name="status_pending">#FFC107</color>
+    <color name="status_pending_bg">#33FFC107</color>
+    <color name="status_approved">#2ECC71</color>
+    <color name="status_approved_bg">#332ECC71</color>
+    <color name="status_rejected">#E05D5D</color>
+    <color name="status_rejected_bg">#33E05D5D</color>
+
+    <!-- Role Badge Colors -->
+    <color name="role_super_admin">#9C27B0</color>
+    <color name="role_super_admin_bg">#339C27B0</color>
+    <color name="role_mountain_admin">#2196F3</color>
+    <color name="role_mountain_admin_bg">#332196F3</color>
+    <color name="role_news_admin">#FF9800</color>
+    <color name="role_news_admin_bg">#33FF9800</color>
+
+    <!-- Input Field Colors -->
+    <color name="input_background">#2D2D2D</color>
+    <color name="input_stroke">#424242</color>
+
+    <!-- Chart Colors -->
+    <color name="chart_bar">#4DB6AC</color>
+    <color name="chart_bar_selected">#80CBC4</color>
+
+    <!-- Button Colors -->
+    <color name="button_danger">#EF5350</color>
+    <color name="button_danger_bg">#33EF5350</color>
+
+    <!-- Other Colors -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="divider">#424242</color>
+</resources>

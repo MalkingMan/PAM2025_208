@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MountTrack"
+        tools:targetApi="31">
+
+        <!-- Auth Activities -->
+        <activity
+            android:name=".ui.auth.LoginActivity"
+            android:exported="true"
+            android:theme="@style/Theme.MountTrack">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.auth.RegisterActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MountTrack" />
+
+        <!-- Main Activities -->
+        <activity
+            android:name=".ui.dashboard.DashboardActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MountTrack" />
+
+        <activity
+            android:name=".ui.mountains.MountainsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MountTrack" />
+
+        <activity
+            android:name=".ui.news.NewsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MountTrack" />
+
+        <activity
+            android:name=".ui.news.detail.NewsDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MountTrack" />
+
+        <activity
+            android:name=".ui.registration.MountainRegistrationActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MountTrack"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.status.StatusActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MountTrack" />
+
+        <activity
+            android:name=".ui.settings.SettingsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MountTrack" />
+
+        <activity
+            android:name=".ui.settings.EditProfileActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MountTrack"
+            android:windowSoftInputMode="adjustResize" />
+
+    </application>
+
+</manifest>
+

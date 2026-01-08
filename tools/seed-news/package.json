@@ -1,0 +1,14 @@
+{
+  "name": "mounttrack-seed-news",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Seed Firestore collection `news` for MountTrack",
+  "scripts": {
+    "seed": "node seed-news.mjs"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.7.0"
+  }
+}
+

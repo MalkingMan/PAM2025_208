@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MountAdmin"
+        tools:targetApi="31">
+
+        <!-- Auth Activities -->
+        <activity
+            android:name=".ui.auth.LoginActivity"
+            android:exported="true"
+            android:theme="@style/Theme.MountAdmin">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Dashboard Activities -->
+        <activity
+            android:name=".ui.dashboard.SuperAdminDashboardActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MountAdmin" />
+
+        <!-- Gunung Admin Dashboard -->
+        <activity
+            android:name=".ui.gunungadmin.dashboard.GunungAdminDashboardActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MountAdmin" />
+
+        <!-- Admin Management Activities -->
+        <activity
+            android:name=".ui.admin.ManageAdminsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MountAdmin" />
+
+        <activity
+            android:name=".ui.admin.AddAdminActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MountAdmin"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.admin.EditAdminActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MountAdmin"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Mountain Management Activities -->
+        <activity
+            android:name=".ui.mountain.ManageMountainsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MountAdmin" />
+
+        <activity
+            android:name=".ui.mountain.AddMountainActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MountAdmin"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.mountain.EditMountainActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MountAdmin"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- News Management Activities -->
+        <activity
+            android:name=".ui.news.ManageNewsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MountAdmin" />
+
+        <activity
+            android:name=".ui.news.AddNewsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MountAdmin"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.news.EditNewsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MountAdmin"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- News Admin Dashboard -->
+        <activity
+            android:name=".ui.news.NewsAdminDashboardActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MountAdmin" />
+
+        <!-- Settings Activities -->
+        <activity
+            android:name=".ui.settings.SettingsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MountAdmin" />
+
+        <activity
+            android:name=".ui.settings.EditProfileActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MountAdmin"
+            android:windowSoftInputMode="adjustResize" />
+
+    </application>
+
+</manifest>

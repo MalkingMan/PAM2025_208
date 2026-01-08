@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "512904758984",
+    "project_id": "trackmountain1",
+    "storage_bucket": "trackmountain1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:512904758984:android:c463e8beb6ce46f09907fd",
+        "android_client_info": {
+          "package_name": "com.example.mountadmin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "512904758984-kcvqvaiml5itjcg0nboq15quem12l61k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCljk8yNOADkHtBtuNZNZ1RryFOIXGW7gg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "512904758984-kcvqvaiml5itjcg0nboq15quem12l61k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
