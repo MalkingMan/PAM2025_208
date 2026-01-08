@@ -1,6 +1,8 @@
 package com.example.mountadmin.ui.mountain
 
+import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
+import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -44,27 +46,47 @@ class MountainsAdapter(
             binding.tvLocation.text = "${mountain.province}, ${mountain.country}"
             binding.chipElevation.text = "${mountain.elevation} m"
 
-            // Image loading rules: HTTPS only from Firestore
-            val url = mountain.imageUrl.trim()
-            Log.d("MountainsAdapter", "mountain=${mountain.id} url=${url.take(80)}")
-
+            // Reset view state for recycled holders
             binding.progressImage.visibility = View.GONE
+            binding.ivMountain.setImageDrawable(null)
+            binding.ivMountain.setImageResource(R.drawable.ic_mountain_placeholder)
 
-            if (url.isBlank()) {
-                binding.ivMountain.setImageResource(R.drawable.ic_mountain_placeholder)
+            val value = mountain.imageUrl.trim()
+            Log.d("MountainsAdapter", "mountain=${mountain.id} image(len=${value.length})=${value.take(48)}")
+
+            if (value.isBlank()) return
+
+            // If Base64 (old pipeline), decode and show
+            if (isLikelyBase64Image(value)) {
+                val bytes = try {
+                    Base64.decode(value.substringAfter(",", value), Base64.DEFAULT)
+                } catch (_: IllegalArgumentException) {
+                    null
+                }
+
+                if (bytes == null || bytes.isEmpty()) {
+                    Log.w("MountainsAdapter", "Base64 decode failed mountain=${mountain.id}")
+                    return
+                }
+
+                val bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                if (bmp != null) {
+                    binding.ivMountain.setImageBitmap(bmp)
+                } else {
+                    Log.w("MountainsAdapter", "Bitmap decode failed mountain=${mountain.id}")
+                }
                 return
             }
 
-            if (!url.startsWith("https://")) {
-                Log.w("MountainsAdapter", "Non-https imageUrl blocked for mountain=${mountain.id}")
-                binding.ivMountain.setImageResource(R.drawable.ic_mountain_placeholder)
+            // Otherwise treat as URL. Prefer HTTPS, but allow http(s) as fallback if needed.
+            if (!value.startsWith("http", ignoreCase = true)) {
+                Log.w("MountainsAdapter", "Unsupported imageUrl format mountain=${mountain.id}")
                 return
             }
 
             binding.progressImage.visibility = View.VISIBLE
-
             Glide.with(binding.root)
-                .load(url)
+                .load(value)
                 .placeholder(R.drawable.ic_mountain_placeholder)
                 .error(R.drawable.ic_mountain_placeholder)
                 .centerCrop()
@@ -75,7 +97,7 @@ class MountainsAdapter(
                         target: Target<Drawable>,
                         isFirstResource: Boolean
                     ): Boolean {
-                        Log.e("MountainsAdapter", "Glide load failed mountain=${mountain.id} url=$url", e)
+                        Log.e("MountainsAdapter", "Glide load failed mountain=${mountain.id} url=$value", e)
                         binding.progressImage.visibility = View.GONE
                         return false
                     }
@@ -95,6 +117,11 @@ class MountainsAdapter(
 
             binding.btnEdit.setOnClickListener { onEditClick(mountain) }
             binding.btnDelete.setOnClickListener { onDeleteClick(mountain) }
+        }
+
+        private fun isLikelyBase64Image(v: String): Boolean {
+            return v.startsWith("data:image", ignoreCase = true) ||
+                (v.length > 200 && v.trim().matches(Regex("^[A-Za-z0-9+/=\\r\\n]+$")))
         }
     }
 
