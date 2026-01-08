@@ -1,5 +1,6 @@
 package com.example.mountadmin.ui.mountain
 
+import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -67,11 +68,11 @@ class MountainsAdapter(
                 .placeholder(R.drawable.ic_mountain_placeholder)
                 .error(R.drawable.ic_mountain_placeholder)
                 .centerCrop()
-                .listener(object : RequestListener<android.graphics.drawable.Drawable> {
+                .listener(object : RequestListener<Drawable> {
                     override fun onLoadFailed(
                         e: GlideException?,
                         model: Any?,
-                        target: Target<android.graphics.drawable.Drawable>?,
+                        target: Target<Drawable>,
                         isFirstResource: Boolean
                     ): Boolean {
                         Log.e("MountainsAdapter", "Glide load failed mountain=${mountain.id} url=$url", e)
@@ -80,10 +81,10 @@ class MountainsAdapter(
                     }
 
                     override fun onResourceReady(
-                        resource: android.graphics.drawable.Drawable?,
-                        model: Any?,
-                        target: Target<android.graphics.drawable.Drawable>?,
-                        dataSource: DataSource?,
+                        resource: Drawable,
+                        model: Any,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource,
                         isFirstResource: Boolean
                     ): Boolean {
                         binding.progressImage.visibility = View.GONE

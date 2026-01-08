@@ -46,7 +46,14 @@ class ManageMountainsActivity : AppCompatActivity() {
                 startActivity(intent)
             },
             onDeleteClick = { mountain ->
-                viewModel.deleteMountain(mountain.id)
+                MaterialAlertDialogBuilder(this, R.style.Theme_MountAdmin_AlertDialog)
+                    .setTitle("Delete mountain")
+                    .setMessage("Delete \"${mountain.name}\"? This action cannot be undone.")
+                    .setPositiveButton("Delete") { _, _ ->
+                        viewModel.deleteMountain(mountain.id)
+                    }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show()
             }
         )
 
