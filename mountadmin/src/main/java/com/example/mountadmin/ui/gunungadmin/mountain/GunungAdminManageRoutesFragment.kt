@@ -144,14 +144,15 @@ class GunungAdminManageRoutesFragment : Fragment() {
     }
 
     private fun confirmDelete(route: HikingRoute) {
-        if (route.usedCapacity > 0) {
-            Snackbar.make(binding.root, "Route has used capacity (${route.usedCapacity}). Close it instead of deleting.", Snackbar.LENGTH_LONG).show()
-            return
+        val warning = if (route.usedCapacity > 0) {
+            "\n\nWarning: This route already has used capacity (${route.usedCapacity}). Deleting it will NOT delete existing registrations. Charts will show the route name based on registration data."
+        } else {
+            ""
         }
 
         MaterialAlertDialogBuilder(requireContext(), R.style.Theme_MountAdmin_AlertDialog)
             .setTitle("Delete Route")
-            .setMessage("Delete route \"${route.name}\"?")
+            .setMessage("Hard delete route \"${route.name}\"?${warning}")
             .setPositiveButton("Delete") { _, _ ->
                 viewModel.deleteRoute(mountainId, route)
             }
@@ -176,4 +177,3 @@ class GunungAdminManageRoutesFragment : Fragment() {
         }
     }
 }
-
