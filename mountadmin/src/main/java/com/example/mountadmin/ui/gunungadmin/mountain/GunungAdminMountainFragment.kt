@@ -44,6 +44,16 @@ class GunungAdminMountainFragment : Fragment() {
         setupRecyclerView()
         setupObservers()
 
+        binding.btnManageRoutes.setOnClickListener {
+            if (mountainId.isNotBlank()) {
+                val fragment = GunungAdminManageRoutesFragment.newInstance(mountainId)
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit()
+            }
+        }
+
         if (mountainId.isNotEmpty()) {
             viewModel.loadMountainData(mountainId)
         }
@@ -112,4 +122,3 @@ class GunungAdminMountainFragment : Fragment() {
         }
     }
 }
-

@@ -1,5 +1,6 @@
 package com.example.mountadmin.ui.gunungadmin.dashboard
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,6 +11,7 @@ import com.example.mountadmin.data.model.Registration
 import com.example.mountadmin.data.repository.RouteCapacityRepository
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class GunungAdminDashboardViewModel : ViewModel() {
 
@@ -37,6 +39,9 @@ class GunungAdminDashboardViewModel : ViewModel() {
     private val _routeCapacities = MutableLiveData<List<RouteCapacity>>(emptyList())
     val routeCapacities: LiveData<List<RouteCapacity>> = _routeCapacities
 
+    private val _routeRegistrationChart = MutableLiveData<List<RouteRegistrationCount>>(emptyList())
+    val routeRegistrationChart: LiveData<List<RouteRegistrationCount>> = _routeRegistrationChart
+
     private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading
 
@@ -54,6 +59,9 @@ class GunungAdminDashboardViewModel : ViewModel() {
 
         // Load recent registrations
         loadRecentRegistrations(mountainId)
+
+        // Load chart data
+        loadRouteRegistrationChart(mountainId)
     }
 
     private fun loadMountainDataWithCapacity(mountainId: String) {
@@ -152,6 +160,65 @@ class GunungAdminDashboardViewModel : ViewModel() {
             }
     }
 
+    private fun loadRouteRegistrationChart(mountainId: String) {
+        viewModelScope.launch {
+            try {
+                // Prefer route list from mountain (labels)
+                val routes = capacityRepository.getRoutesWithCapacity(mountainId).getOrElse { emptyList() }
+
+                val snapshot = firestore.collection("registrations")
+                    .whereEqualTo("mountainId", mountainId)
+                    .get()
+                    .await()
+
+                val countsByKey = mutableMapOf<String, Int>()
+                snapshot.documents.forEach { doc ->
+                    val routeId = doc.getString("routeId").orEmpty()
+                    val routeName = doc.getString("route").orEmpty()
+                    val key = routeId.ifEmpty { routeName }
+                    if (key.isNotBlank()) {
+                        countsByKey[key] = (countsByKey[key] ?: 0) + 1
+                    }
+                }
+
+                // Build chart list in a stable order: map known routes first, then unknown
+                val known = routes.mapNotNull { r ->
+                    val key = r.routeId.ifEmpty { r.name }
+                    val count = countsByKey[key] ?: countsByKey[r.name] ?: 0
+                    RouteRegistrationCount(
+                        key = key,
+                        routeId = r.routeId,
+                        routeName = r.name,
+                        count = count
+                    )
+                }
+
+                // Include registrations that reference deleted/unknown routes
+                val knownKeys = known.map { it.key }.toSet()
+                val unknown = countsByKey
+                    .filterKeys { it.isNotBlank() && !knownKeys.contains(it) }
+                    .map { (key, count) ->
+                        RouteRegistrationCount(
+                            key = key,
+                            routeId = "",
+                            routeName = key,
+                            count = count
+                        )
+                    }
+
+                val merged = (known + unknown)
+                    .filter { it.count > 0 }
+                    .sortedByDescending { it.count }
+
+                _routeRegistrationChart.value = merged
+            } catch (e: Exception) {
+                Log.e("GunungAdminDashboardVM", "Error loading route chart: ${e.message}", e)
+                // fail silently but keep an empty chart
+                _routeRegistrationChart.value = emptyList()
+            }
+        }
+    }
+
     /**
      * Update route status (open/closed)
      */
@@ -186,3 +253,9 @@ data class RouteCapacity(
     val routeStatus: String = HikingRoute.STATUS_OPEN
 )
 
+data class RouteRegistrationCount(
+    val key: String,
+    val routeId: String,
+    val routeName: String,
+    val count: Int
+)

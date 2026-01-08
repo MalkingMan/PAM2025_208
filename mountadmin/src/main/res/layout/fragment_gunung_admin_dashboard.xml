@@ -434,6 +434,48 @@
             android:layout_marginBottom="20dp"
             android:nestedScrollingEnabled="false" />
 
+        <!-- NEW: Registrations per Route Chart -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Registrations per Route"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp" />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            app:cardBackgroundColor="@color/gunung_card"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/barChartRoutes"
+                    android:layout_width="match_parent"
+                    android:layout_height="220dp" />
+
+                <TextView
+                    android:id="@+id/tvNoRouteChartData"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingTop="8dp"
+                    android:text="No route registrations yet"
+                    android:textColor="#9AA4AF"
+                    android:textSize="12sp"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
         <!-- Recent Registrations Header -->
         <LinearLayout
             android:layout_width="match_parent"

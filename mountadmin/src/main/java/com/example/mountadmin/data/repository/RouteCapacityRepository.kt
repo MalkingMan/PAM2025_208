@@ -446,5 +446,112 @@ class RouteCapacityRepository {
             Result.failure(e)
         }
     }
-}
 
+    /**
+     * Add a new route or update an existing route (matched by routeId, fallback by name).
+     * Preserves usedCapacity unless the caller provides it.
+     */
+    suspend fun addOrUpdateRoute(
+        mountainId: String,
+        route: HikingRoute
+    ): Result<Unit> {
+        return try {
+            firestore.runTransaction { transaction ->
+                val mountainRef = firestore.collection(COLLECTION_MOUNTAINS).document(mountainId)
+                val mountainSnapshot = transaction.get(mountainRef)
+
+                if (!mountainSnapshot.exists()) {
+                    throw Exception("Mountain not found")
+                }
+
+                val routesData = mountainSnapshot.get("routes") as? List<Map<String, Any>> ?: emptyList()
+
+                val routeIndex = routesData.indexOfFirst {
+                    val existingId = it["routeId"] as? String
+                    val existingName = it["name"] as? String
+                    (route.routeId.isNotBlank() && existingId == route.routeId) ||
+                        (route.routeId.isBlank() && existingName == route.name)
+                }
+
+                val routeMap = mutableMapOf<String, Any>(
+                    "routeId" to (route.routeId.ifBlank { route.name }),
+                    "name" to route.name,
+                    "difficulty" to route.difficulty,
+                    "estimatedTime" to route.estimatedTime,
+                    "distance" to route.distance,
+                    "maxCapacity" to route.maxCapacity,
+                    "usedCapacity" to route.usedCapacity,
+                    "status" to route.status
+                )
+
+                val updated = routesData.toMutableList()
+
+                if (routeIndex >= 0) {
+                    // Preserve usedCapacity if stored used is higher (safety)
+                    val curr = routesData[routeIndex]
+                    val currUsed = (curr["usedCapacity"] as? Long)?.toInt() ?: (curr["usedCapacity"] as? Int ?: 0)
+                    if (routeMap["usedCapacity"] is Int) {
+                        val newUsed = route.usedCapacity
+                        routeMap["usedCapacity"] = maxOf(currUsed, newUsed)
+                    }
+
+                    updated[routeIndex] = routeMap
+                } else {
+                    // New route
+                    if (routeMap["routeId"].toString().isBlank()) {
+                        routeMap["routeId"] = java.util.UUID.randomUUID().toString()
+                    }
+                    if ((routeMap["maxCapacity"] as? Int ?: 0) <= 0) {
+                        routeMap["maxCapacity"] = 100
+                    }
+                    if (routeMap["status"].toString().isBlank()) {
+                        routeMap["status"] = HikingRoute.STATUS_OPEN
+                    }
+                    updated.add(routeMap)
+                }
+
+                transaction.update(mountainRef, "routes", updated)
+            }.await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error addOrUpdateRoute: ${e.message}", e)
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Delete route if it exists. Caller should enforce safety checks (e.g., usedCapacity == 0).
+     */
+    suspend fun deleteRoute(
+        mountainId: String,
+        route: HikingRoute
+    ): Result<Unit> {
+        return try {
+            firestore.runTransaction { transaction ->
+                val mountainRef = firestore.collection(COLLECTION_MOUNTAINS).document(mountainId)
+                val mountainSnapshot = transaction.get(mountainRef)
+
+                if (!mountainSnapshot.exists()) {
+                    throw Exception("Mountain not found")
+                }
+
+                val routesData = mountainSnapshot.get("routes") as? List<Map<String, Any>> ?: emptyList()
+
+                val updated = routesData.filterNot {
+                    val existingId = it["routeId"] as? String
+                    val existingName = it["name"] as? String
+                    (route.routeId.isNotBlank() && existingId == route.routeId) ||
+                        existingName == route.name
+                }
+
+                transaction.update(mountainRef, "routes", updated)
+            }.await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error deleteRoute: ${e.message}", e)
+            Result.failure(e)
+        }
+    }
+}

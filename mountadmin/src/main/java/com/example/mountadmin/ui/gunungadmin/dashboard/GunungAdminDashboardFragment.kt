@@ -1,9 +1,11 @@
 package com.example.mountadmin.ui.gunungadmin.dashboard
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -11,7 +13,17 @@ import com.bumptech.glide.Glide
 import com.example.mountadmin.R
 import com.example.mountadmin.databinding.FragmentGunungAdminDashboardBinding
 import com.example.mountadmin.ui.gunungadmin.mountain.GunungAdminMountainFragment
+import com.example.mountadmin.utils.gone
+import com.example.mountadmin.utils.visible
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.formatter.ValueFormatter
 import com.google.android.material.snackbar.Snackbar
+import kotlin.math.ceil
+import kotlin.math.max
 
 class GunungAdminDashboardFragment : Fragment() {
 
@@ -48,6 +60,7 @@ class GunungAdminDashboardFragment : Fragment() {
 
         setupUI()
         setupRecyclerViews()
+        setupChart()
         setupObservers()
 
         if (mountainId.isNotEmpty()) {
@@ -89,6 +102,42 @@ class GunungAdminDashboardFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = recentRegistrationAdapter
             setHasFixedSize(true)
+        }
+    }
+
+    private fun setupChart() {
+        binding.barChartRoutes.apply {
+            description.isEnabled = false
+            legend.isEnabled = false
+            setDrawGridBackground(false)
+            setDrawBarShadow(false)
+            setFitBars(true)
+            animateY(800)
+
+            xAxis.apply {
+                position = XAxis.XAxisPosition.BOTTOM
+                setDrawGridLines(false)
+                textColor = Color.WHITE
+                textSize = 10f
+                granularity = 1f
+                labelRotationAngle = -30f
+            }
+
+            axisLeft.apply {
+                setDrawGridLines(true)
+                gridColor = Color.parseColor("#3D444C")
+                textColor = Color.WHITE
+                textSize = 10f
+                axisMinimum = 0f
+                granularity = 1f
+                valueFormatter = object : ValueFormatter() {
+                    override fun getAxisLabel(value: Float, axis: com.github.mikephil.charting.components.AxisBase?): String {
+                        return value.toInt().toString()
+                    }
+                }
+            }
+
+            axisRight.isEnabled = false
         }
     }
 
@@ -166,6 +215,10 @@ class GunungAdminDashboardFragment : Fragment() {
                 if (registrations.isEmpty()) View.VISIBLE else View.GONE
         }
 
+        viewModel.routeRegistrationChart.observe(viewLifecycleOwner) { data ->
+            updateRouteChart(data)
+        }
+
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
         }
@@ -175,6 +228,43 @@ class GunungAdminDashboardFragment : Fragment() {
                 Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG).show()
                 viewModel.clearError()
             }
+        }
+    }
+
+    private fun updateRouteChart(data: List<RouteRegistrationCount>) {
+        if (data.isEmpty()) {
+            binding.barChartRoutes.clear()
+            binding.barChartRoutes.invalidate()
+            binding.tvNoRouteChartData.visible()
+            return
+        }
+
+        binding.tvNoRouteChartData.gone()
+
+        val entries = data.mapIndexed { index, item ->
+            BarEntry(index.toFloat(), item.count.toFloat())
+        }
+        val labels = data.map { it.routeName }
+
+        val dataSet = BarDataSet(entries, "Registrations").apply {
+            color = ContextCompat.getColor(requireContext(), R.color.gunung_accent)
+            setDrawValues(true)
+            valueTextColor = Color.WHITE
+            valueTextSize = 10f
+        }
+
+        val maxValue = data.maxOfOrNull { it.count }?.toFloat() ?: 0f
+        val axisMax = max(2f, ceil(maxValue / 2f) * 2f)
+
+        binding.barChartRoutes.apply {
+            xAxis.valueFormatter = IndexAxisValueFormatter(labels)
+            xAxis.labelCount = labels.size
+            axisLeft.axisMaximum = axisMax
+            axisLeft.setLabelCount((axisMax / 2f).toInt() + 1, true)
+            this.data = BarData(dataSet).apply {
+                barWidth = 0.6f
+            }
+            invalidate()
         }
     }
 
@@ -213,4 +303,3 @@ class GunungAdminDashboardFragment : Fragment() {
         }
     }
 }
-
