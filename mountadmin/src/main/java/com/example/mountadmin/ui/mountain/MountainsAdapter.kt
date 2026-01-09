@@ -41,7 +41,20 @@ class MountainsAdapter(
         private val binding: ItemMountainAdminBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
+        private var currentMountain: Mountain? = null
+
+        init {
+            binding.btnEdit.setOnClickListener {
+                currentMountain?.let(onEditClick)
+            }
+            binding.btnDelete.setOnClickListener {
+                currentMountain?.let(onDeleteClick)
+            }
+        }
+
         fun bind(mountain: Mountain) {
+            currentMountain = mountain
+
             binding.tvName.text = mountain.name
             binding.tvLocation.text = "${mountain.province}, ${mountain.country}"
             binding.chipElevation.text = "${mountain.elevation} m"
@@ -115,8 +128,7 @@ class MountainsAdapter(
                 })
                 .into(binding.ivMountain)
 
-            binding.btnEdit.setOnClickListener { onEditClick(mountain) }
-            binding.btnDelete.setOnClickListener { onDeleteClick(mountain) }
+            // listeners are handled in init{}
         }
 
         private fun isLikelyBase64Image(v: String): Boolean {
