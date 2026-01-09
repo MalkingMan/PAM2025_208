@@ -104,8 +104,8 @@
             android:id="@+id/actionContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="12dp"
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="@id/ivMountain"
             app:layout_constraintEnd_toEndOf="@id/ivMountain">
@@ -113,27 +113,27 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnEdit"
                 style="@style/Widget.Material3.Button.IconButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
                 android:contentDescription="Edit"
                 app:icon="@drawable/ic_edit"
                 app:iconTint="@color/white"
                 app:iconSize="20dp"
                 app:backgroundTint="#3D444C"
-                app:cornerRadius="12dp" />
+                app:cornerRadius="22dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnDelete"
                 style="@style/Widget.Material3.Button.IconButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="8dp"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginStart="10dp"
                 android:contentDescription="Delete"
                 app:icon="@drawable/ic_delete"
                 app:iconTint="@color/white"
                 app:iconSize="20dp"
                 app:backgroundTint="#E05D5D"
-                app:cornerRadius="12dp" />
+                app:cornerRadius="22dp" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
