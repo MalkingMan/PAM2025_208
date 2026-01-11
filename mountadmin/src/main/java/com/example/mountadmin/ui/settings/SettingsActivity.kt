@@ -13,6 +13,7 @@ import com.example.mountadmin.ui.auth.LoginActivity
 import com.example.mountadmin.ui.dashboard.SuperAdminDashboardActivity
 import com.example.mountadmin.ui.mountain.ManageMountainsActivity
 import com.example.mountadmin.ui.news.ManageNewsActivity
+import com.google.firebase.auth.FirebaseAuth
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -26,6 +27,14 @@ class SettingsActivity : AppCompatActivity() {
 
         setupBottomNavigation()
         setupClickListeners()
+        bindProfileHeader()
+    }
+
+    private fun bindProfileHeader() {
+        val user = FirebaseAuth.getInstance().currentUser
+        binding.tvAdminName.text = user?.displayName ?: (user?.email?.substringBefore("@") ?: "Admin")
+        binding.tvAdminEmail.text = user?.email ?: ""
+        binding.tvAdminRole.text = "SUPER ADMIN"
     }
 
     private fun setupBottomNavigation() {
@@ -89,6 +98,6 @@ class SettingsActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         binding.bottomNavigation.selectedItemId = R.id.nav_settings
+        bindProfileHeader()
     }
 }
-

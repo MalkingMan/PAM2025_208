@@ -13,6 +13,7 @@ import com.example.mountadmin.data.repository.AuthRepository
 import com.example.mountadmin.databinding.FragmentNewsAdminProfileBinding
 import com.example.mountadmin.ui.auth.LoginActivity
 import com.example.mountadmin.ui.settings.EditProfileActivity
+import com.google.firebase.auth.FirebaseAuth
 
 class NewsAdminProfileFragment : Fragment() {
 
@@ -33,6 +34,14 @@ class NewsAdminProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupClickListeners()
+        bindProfileHeader()
+    }
+
+    private fun bindProfileHeader() {
+        val user = FirebaseAuth.getInstance().currentUser
+        binding.tvAdminName.text = user?.displayName ?: (user?.email?.substringBefore("@") ?: "Admin")
+        binding.tvAdminEmail.text = user?.email ?: ""
+        binding.tvAdminRole.text = "NEWS ADMIN"
     }
 
     private fun setupClickListeners() {
@@ -66,9 +75,14 @@ class NewsAdminProfileFragment : Fragment() {
         requireActivity().finish()
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Refresh after EditProfileActivity
+        bindProfileHeader()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 }
-

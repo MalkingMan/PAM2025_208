@@ -132,6 +132,9 @@
     <string name="error_select_role">Please select a role</string>
     <string name="error_select_mountain">Please select a mountain for Mountain Admin</string>
     <string name="error_generic">Something went wrong. Please try again.</string>
+    <string name="error_current_password_required">Current password is required</string>
+    <string name="error_password_update_failed">Failed to update password</string>
+    <string name="error_reauth_required">Please re-login and try again</string>
 
     <!-- Success -->
     <string name="success_admin_created">Admin created successfully</string>
@@ -142,6 +145,7 @@
     <string name="success_article_published">Article published successfully</string>
     <string name="success_article_saved">Article saved as draft</string>
     <string name="success_logout">Logged out successfully</string>
+    <string name="success_password_updated">Password updated successfully</string>
 
     <!-- Confirmations -->
     <string name="confirm_delete_admin">Are you sure you want to delete this admin?</string>
@@ -180,4 +184,13 @@
     <string name="success_rejected">Registration rejected successfully</string>
     <string name="profile">Profile</string>
     <string name="edit_route">Edit Route</string>
+
+    <!-- Change Password -->
+    <string name="change_password">Change Password</string>
+    <string name="current_password">Current Password</string>
+    <string name="enter_current_password">Enter current password</string>
+    <string name="new_password">New Password</string>
+    <string name="enter_new_password">Enter new password</string>
+    <string name="confirm_new_password">Confirm New Password</string>
+    <string name="enter_confirm_new_password">Confirm new password</string>
 </resources>

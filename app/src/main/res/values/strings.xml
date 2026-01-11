@@ -79,6 +79,19 @@
     <string name="update_profile">Update Profile</string>
     <string name="profile_updated">Profile updated successfully</string>
 
+    <!-- Change Password -->
+    <string name="change_password">Change Password</string>
+    <string name="current_password">Current Password</string>
+    <string name="enter_current_password">Enter current password</string>
+    <string name="new_password">New Password</string>
+    <string name="enter_new_password">Enter new password</string>
+    <string name="confirm_new_password">Confirm New Password</string>
+    <string name="enter_confirm_new_password">Confirm new password</string>
+    <string name="error_current_password_required">Current password is required</string>
+    <string name="success_password_updated">Password updated successfully</string>
+    <string name="error_password_update_failed">Failed to update password</string>
+    <string name="error_reauth_required">Please re-login and try again</string>
+
     <!-- Errors -->
     <string name="error_empty_email">Email is required</string>
     <string name="error_invalid_email">Invalid email format</string>

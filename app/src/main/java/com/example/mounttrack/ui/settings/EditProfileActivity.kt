@@ -6,9 +6,15 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.mounttrack.R
+import com.example.mounttrack.data.firebase.FirebaseHelper
 import com.example.mounttrack.databinding.ActivityEditProfileBinding
 import com.example.mounttrack.utils.gone
 import com.example.mounttrack.utils.visible
+import com.google.firebase.auth.EmailAuthProvider
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -20,6 +26,8 @@ class EditProfileActivity : AppCompatActivity() {
 
     private val calendar = Calendar.getInstance()
     private val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+
+    private val uiScope = MainScope()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +55,13 @@ class EditProfileActivity : AppCompatActivity() {
         }
 
         binding.btnUpdate.setOnClickListener {
-            validateAndUpdate()
+            if (validatePasswordSection()) {
+                if (shouldChangePassword()) {
+                    changePasswordThenUpdateProfile()
+                } else {
+                    validateAndUpdate()
+                }
+            }
         }
     }
 
@@ -107,6 +121,114 @@ class EditProfileActivity : AppCompatActivity() {
         }
     }
 
+    private fun shouldChangePassword(): Boolean {
+        val current = binding.etCurrentPassword.text?.toString().orEmpty().trim()
+        val newPass = binding.etNewPassword.text?.toString().orEmpty().trim()
+        val confirm = binding.etConfirmNewPassword.text?.toString().orEmpty().trim()
+        return current.isNotEmpty() || newPass.isNotEmpty() || confirm.isNotEmpty()
+    }
+
+    private fun validatePasswordSection(): Boolean {
+        // also validate existing profile fields (fullName) via validateAndUpdate() path
+        var isValid = true
+
+        if (shouldChangePassword()) {
+            val current = binding.etCurrentPassword.text?.toString().orEmpty().trim()
+            val newPass = binding.etNewPassword.text?.toString().orEmpty().trim()
+            val confirm = binding.etConfirmNewPassword.text?.toString().orEmpty().trim()
+
+            if (current.isEmpty()) {
+                binding.tilCurrentPassword.error = getString(R.string.error_current_password_required)
+                isValid = false
+            } else {
+                binding.tilCurrentPassword.error = null
+            }
+
+            if (newPass.isEmpty()) {
+                binding.tilNewPassword.error = getString(R.string.error_empty_password)
+                isValid = false
+            } else if (newPass.length < 6) {
+                binding.tilNewPassword.error = getString(R.string.error_password_short)
+                isValid = false
+            } else {
+                binding.tilNewPassword.error = null
+            }
+
+            if (confirm.isEmpty()) {
+                binding.tilConfirmNewPassword.error = getString(R.string.confirm_password)
+                isValid = false
+            } else if (confirm != newPass) {
+                binding.tilConfirmNewPassword.error = getString(R.string.error_passwords_not_match)
+                isValid = false
+            } else {
+                binding.tilConfirmNewPassword.error = null
+            }
+        } else {
+            binding.tilCurrentPassword.error = null
+            binding.tilNewPassword.error = null
+            binding.tilConfirmNewPassword.error = null
+        }
+
+        return isValid
+    }
+
+    private fun changePasswordThenUpdateProfile() {
+        val user = FirebaseHelper.currentUser
+        val email = user?.email
+
+        if (user == null || email.isNullOrBlank()) {
+            Toast.makeText(this, getString(R.string.error_reauth_required), Toast.LENGTH_LONG).show()
+            return
+        }
+
+        // NOTE: If user logged in with Google, reauth with password won't work.
+        // We'll show a clear message.
+        val providerIds = user.providerData.mapNotNull { it?.providerId }
+        val hasPasswordProvider = providerIds.contains("password")
+        if (!hasPasswordProvider) {
+            Toast.makeText(
+                this,
+                getString(R.string.error_reauth_required),
+                Toast.LENGTH_LONG
+            ).show()
+            return
+        }
+
+        val current = binding.etCurrentPassword.text?.toString().orEmpty().trim()
+        val newPass = binding.etNewPassword.text?.toString().orEmpty().trim()
+
+        uiScope.launch {
+            try {
+                binding.progressBar.visible()
+                binding.btnUpdate.text = ""
+                binding.btnUpdate.isEnabled = false
+
+                val credential = EmailAuthProvider.getCredential(email, current)
+                user.reauthenticate(credential).await()
+                user.updatePassword(newPass).await()
+
+                // Clear fields after success
+                binding.etCurrentPassword.setText("")
+                binding.etNewPassword.setText("")
+                binding.etConfirmNewPassword.setText("")
+
+                Toast.makeText(this@EditProfileActivity, getString(R.string.success_password_updated), Toast.LENGTH_SHORT).show()
+
+                // Continue normal profile update
+                validateAndUpdate()
+            } catch (e: Exception) {
+                binding.progressBar.gone()
+                binding.btnUpdate.text = getString(R.string.update_profile)
+                binding.btnUpdate.isEnabled = true
+                Toast.makeText(
+                    this@EditProfileActivity,
+                    e.message ?: getString(R.string.error_password_update_failed),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+
     private fun validateAndUpdate() {
         val fullName = binding.etFullName.text.toString().trim()
         val phone = binding.etPhone.text.toString().trim()
@@ -123,5 +245,9 @@ class EditProfileActivity : AppCompatActivity() {
         // Update profile
         viewModel.updateProfile(fullName, phone, dob, address)
     }
-}
 
+    override fun onDestroy() {
+        super.onDestroy()
+        uiScope.cancel()
+    }
+}

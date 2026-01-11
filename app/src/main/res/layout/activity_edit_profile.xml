@@ -32,8 +32,8 @@
                 android:padding="4dp"
                 android:src="@drawable/ic_chevron_right"
                 android:rotation="180"
-                app:tint="@color/text_primary"
-                android:contentDescription="Back" />
+                android:contentDescription="Back"
+                app:tint="@color/text_primary" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -58,7 +58,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/appBar">
 
-            <!-- Full Name Label -->
+            <!-- Full Name -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -66,7 +66,6 @@
                 android:textColor="@color/text_primary"
                 android:textSize="14sp" />
 
-            <!-- Full Name Input -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilFullName"
                 style="@style/Widget.MountTrack.TextInputLayout"
@@ -85,7 +84,7 @@
                     android:textColorHint="@color/text_hint" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Phone Number Label -->
+            <!-- Phone Number -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -94,7 +93,6 @@
                 android:textColor="@color/text_primary"
                 android:textSize="14sp" />
 
-            <!-- Phone Number Input -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilPhone"
                 style="@style/Widget.MountTrack.TextInputLayout"
@@ -115,7 +113,7 @@
                     android:textColorHint="@color/text_hint" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Date of Birth Label -->
+            <!-- Date of Birth -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -124,7 +122,6 @@
                 android:textColor="@color/text_primary"
                 android:textSize="14sp" />
 
-            <!-- Date of Birth Input -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilDob"
                 style="@style/Widget.MountTrack.TextInputLayout"
@@ -148,7 +145,7 @@
                     android:textColorHint="@color/text_hint" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Address Label -->
+            <!-- Address -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -157,7 +154,6 @@
                 android:textColor="@color/text_primary"
                 android:textSize="14sp" />
 
-            <!-- Address Input -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilAddress"
                 style="@style/Widget.MountTrack.TextInputLayout"
@@ -178,7 +174,7 @@
                     android:textColorHint="@color/text_hint" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Email Label -->
+            <!-- Email -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -187,7 +183,6 @@
                 android:textColor="@color/text_primary"
                 android:textSize="14sp" />
 
-            <!-- Email Input (Disabled) -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilEmail"
                 style="@style/Widget.MountTrack.TextInputLayout"
@@ -203,6 +198,99 @@
                     android:enabled="false"
                     android:inputType="textEmailAddress"
                     android:textColor="@color/text_secondary"
+                    android:textColorHint="@color/text_hint" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Change Password -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/change_password"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/current_password"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilCurrentPassword"
+                style="@style/Widget.MountTrack.TextInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="@string/enter_current_password"
+                app:boxBackgroundMode="outline"
+                app:endIconMode="password_toggle">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etCurrentPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_hint" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- New Password -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/new_password"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilNewPassword"
+                style="@style/Widget.MountTrack.TextInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="@string/enter_new_password"
+                app:boxBackgroundMode="outline"
+                app:endIconMode="password_toggle">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etNewPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_hint" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Confirm New Password -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/confirm_new_password"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilConfirmNewPassword"
+                style="@style/Widget.MountTrack.TextInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="@string/enter_confirm_new_password"
+                app:boxBackgroundMode="outline"
+                app:endIconMode="password_toggle">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etConfirmNewPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:textColor="@color/text_primary"
                     android:textColorHint="@color/text_hint" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -239,4 +327,3 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>
-
