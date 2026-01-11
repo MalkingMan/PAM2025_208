@@ -5,8 +5,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.example.mounttrack.R
 import com.example.mounttrack.data.model.HikingNews
 import com.example.mounttrack.databinding.ItemHikingNewsBinding
+import com.example.mounttrack.utils.ImageDecodeUtils
 
 class HikingNewsAdapter : ListAdapter<HikingNews, HikingNewsAdapter.NewsViewHolder>(NewsDiffCallback()) {
 
@@ -30,7 +33,27 @@ class HikingNewsAdapter : ListAdapter<HikingNews, HikingNewsAdapter.NewsViewHold
         fun bind(news: HikingNews) {
             binding.tvNewsTitle.text = news.title
             binding.tvNewsDescription.text = news.description
-            // Image loading would go here with Glide
+
+            // Load cover image (Base64 or URL)
+            val imageValue = news.coverImageUrl
+
+            if (ImageDecodeUtils.isLikelyBase64Image(imageValue)) {
+                val bitmap = ImageDecodeUtils.decodeBase64ToBitmap(imageValue)
+                if (bitmap != null) {
+                    binding.ivNewsImage.setImageBitmap(bitmap)
+                } else {
+                    binding.ivNewsImage.setImageResource(R.drawable.placeholder_mountain)
+                }
+            } else if (imageValue.isNotBlank()) {
+                Glide.with(binding.root.context)
+                    .load(imageValue)
+                    .placeholder(R.drawable.placeholder_mountain)
+                    .error(R.drawable.placeholder_mountain)
+                    .centerCrop()
+                    .into(binding.ivNewsImage)
+            } else {
+                binding.ivNewsImage.setImageResource(R.drawable.placeholder_mountain)
+            }
         }
     }
 
