@@ -277,6 +277,16 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
+                    <!-- New: selected ID card preview (hidden until image picked) -->
+                    <ImageView
+                        android:id="@+id/ivIdCardPreview"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:adjustViewBounds="true"
+                        android:scaleType="centerCrop"
+                        android:visibility="gone"
+                        android:contentDescription="@string/upload_id_card" />
+
                     <ImageView
                         android:id="@+id/ivUploadIcon"
                         android:layout_width="40dp"

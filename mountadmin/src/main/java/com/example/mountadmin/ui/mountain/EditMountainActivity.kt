@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mountadmin.R
 import com.example.mountadmin.data.model.HikingRoute
@@ -20,6 +21,9 @@ import com.example.mountadmin.utils.ImageEncodeUtils
 import com.example.mountadmin.utils.gone
 import com.example.mountadmin.utils.visible
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class EditMountainActivity : AppCompatActivity() {
 
@@ -212,15 +216,24 @@ class EditMountainActivity : AppCompatActivity() {
         // Display existing image if available
         if (mountain.imageUrl.isNotEmpty()) {
             val value = mountain.imageUrl
-            val bytes = try {
-                Base64.decode(value.substringAfter(",", value), Base64.DEFAULT)
-            } catch (_: IllegalArgumentException) {
-                null
-            }
 
-            if (bytes != null && bytes.isNotEmpty()) {
-                val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                if (bitmap != null) {
+            // Decode base64 off the main thread to avoid UI jank/ANR on slower devices
+            lifecycleScope.launch {
+                val bitmap = withContext(Dispatchers.Default) {
+                    val bytes = try {
+                        Base64.decode(value.substringAfter(",", value), Base64.DEFAULT)
+                    } catch (_: IllegalArgumentException) {
+                        null
+                    }
+
+                    if (bytes != null && bytes.isNotEmpty()) {
+                        BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                    } else {
+                        null
+                    }
+                }
+
+                if (bitmap != null && !isFinishing && !isDestroyed) {
                     binding.ivMountainPhoto.visible()
                     binding.layoutUploadPlaceholder.gone()
                     binding.ivMountainPhoto.setImageBitmap(bitmap)

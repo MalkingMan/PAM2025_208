@@ -9,7 +9,9 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mountadmin.R
 import com.example.mountadmin.data.model.Registration
+import com.example.mountadmin.databinding.DialogIdCardPreviewBinding
 import com.example.mountadmin.databinding.FragmentGunungAdminRegistrationBinding
+import com.example.mountadmin.utils.ImageDisplayUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 
@@ -165,10 +167,40 @@ class GunungAdminRegistrationFragment : Fragment() {
     }
 
     private fun showIdCardDialog(registration: Registration) {
-        // In a real app, this would show the ID card image
+        val idCardValue = registration.idCardUri.trim()
+        if (idCardValue.isBlank()) {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("ID Card")
+                .setMessage("No ID Card uploaded for ${registration.fullName}.")
+                .setPositiveButton("OK", null)
+                .show()
+            return
+        }
+
+        // Legacy data: MountTrack previously saved a local content:// URI.
+        // This cannot be opened on admin devices, so show a helpful message.
+        if (idCardValue.startsWith("content://", ignoreCase = true)) {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("ID Card")
+                .setMessage(
+                    "ID Card for ${registration.fullName} was uploaded using an old app version and cannot be viewed here. " +
+                        "Please ask the user to re-upload their ID Card."
+                )
+                .setPositiveButton("OK", null)
+                .show()
+            return
+        }
+
+        val dialogBinding = DialogIdCardPreviewBinding.inflate(layoutInflater)
+        ImageDisplayUtils.loadInto(
+            dialogBinding.ivIdCard,
+            idCardValue,
+            R.drawable.ic_person
+        )
+
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("ID Card")
-            .setMessage("ID Card for ${registration.fullName}\n\nNote: ID Card image viewing is not available in this version.")
+            .setTitle("ID Card - ${registration.fullName}")
+            .setView(dialogBinding.root)
             .setPositiveButton("OK", null)
             .show()
     }
@@ -195,4 +227,3 @@ class GunungAdminRegistrationFragment : Fragment() {
         }
     }
 }
-

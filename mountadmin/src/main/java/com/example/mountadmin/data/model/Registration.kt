@@ -12,6 +12,7 @@ data class Registration(
     val fullName: String = "",
     val email: String = "",
     val phone: String = "",
+    val idCardUri: String = "", // base64 string or content Uri string saved by MountTrack
     val status: String = STATUS_PENDING,
     val createdAt: Timestamp = Timestamp.now()
 ) {
@@ -22,4 +23,3 @@ data class Registration(
         const val STATUS_CANCELLED = "CANCELLED"
     }
 }
-

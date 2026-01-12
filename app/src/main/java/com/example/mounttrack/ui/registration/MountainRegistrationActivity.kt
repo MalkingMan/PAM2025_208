@@ -15,6 +15,8 @@ import com.example.mounttrack.ui.news.NewsActivity
 import com.example.mounttrack.ui.settings.SettingsActivity
 import com.example.mounttrack.ui.status.StatusActivity
 import com.example.mounttrack.utils.Constants
+import com.example.mounttrack.utils.ImageDisplayUtils
+import com.example.mounttrack.utils.ImageEncodeUtils
 import com.example.mounttrack.utils.gone
 import com.example.mounttrack.utils.visible
 import com.google.android.material.datepicker.CalendarConstraints
@@ -130,21 +132,33 @@ class MountainRegistrationActivity : AppCompatActivity() {
     }
 
     private fun handleImageSelected(uri: Uri) {
-        try {
-            // Take persistable URI permission
-            contentResolver.takePersistableUriPermission(
-                uri,
-                Intent.FLAG_GRANT_READ_URI_PERMISSION
-            )
-        } catch (_: SecurityException) {
-            // Permission not available, but we can still use the URI temporarily
+        // NOTE: We intentionally do NOT store the content:// uri in Firestore because it cannot be
+        // accessed from other devices. We encode the image to Base64 and store that string.
+
+        val base64 = ImageEncodeUtils.uriToBase64(this, uri)
+        if (base64.isNullOrBlank()) {
+            Toast.makeText(this, getString(R.string.error_upload_id), Toast.LENGTH_SHORT).show()
+            return
         }
 
-        idCardUri = uri.toString()
+        idCardUri = base64
+
+        // Update UI text
         binding.tvUploadText.text = getString(R.string.id_card_uploaded)
         binding.tvUploadHint.text = getString(R.string.tap_to_change)
 
-        // Optionally display the selected image (you can add ImageView to show preview)
+        // Show preview image and hide the icon/text
+        binding.ivIdCardPreview.visible()
+        binding.ivUploadIcon.gone()
+        binding.tvUploadText.gone()
+        binding.tvUploadHint.gone()
+
+        ImageDisplayUtils.loadInto(
+            binding.ivIdCardPreview,
+            idCardUri,
+            R.drawable.ic_upload
+        )
+
         Toast.makeText(this, getString(R.string.id_card_uploaded_success), Toast.LENGTH_SHORT).show()
     }
 
@@ -308,4 +322,3 @@ class MountainRegistrationActivity : AppCompatActivity() {
         )
     }
 }
-
