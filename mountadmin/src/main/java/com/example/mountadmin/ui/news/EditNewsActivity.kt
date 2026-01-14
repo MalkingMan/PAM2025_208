@@ -92,6 +92,13 @@ class EditNewsActivity : AppCompatActivity() {
             openImagePicker()
         }
 
+        // Ensure the placeholder upload button also opens picker (was missing)
+        runCatching {
+            binding.btnUploadImage.setOnClickListener {
+                openImagePicker()
+            }
+        }
+
         binding.btnChangeImage.setOnClickListener {
             openImagePicker()
         }

@@ -1,13 +1,16 @@
 package com.example.mountadmin.ui.news
 
+import android.net.Uri
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.mountadmin.R
 import com.example.mountadmin.data.model.News
 import com.example.mountadmin.databinding.ActivityAddNewsBinding
+import com.example.mountadmin.utils.ImageEncodeUtils
 import com.example.mountadmin.utils.gone
 import com.example.mountadmin.utils.visible
 
@@ -17,6 +20,17 @@ class AddNewsActivity : AppCompatActivity() {
     private val viewModel: AddNewsViewModel by viewModels()
 
     private var selectedCategory: String = ""
+
+    private var selectedImageUri: Uri? = null
+
+    private val imagePickerLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            selectedImageUri = it
+            displaySelectedImage(it)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +66,17 @@ class AddNewsActivity : AppCompatActivity() {
             onBackPressedDispatcher.onBackPressed()
         }
 
+        // Image upload click listeners (safe: handle both container + explicit button)
+        binding.cardUploadPhoto.setOnClickListener {
+            openImagePicker()
+        }
+        binding.btnUploadImage.setOnClickListener {
+            openImagePicker()
+        }
+        binding.btnChangeImage.setOnClickListener {
+            openImagePicker()
+        }
+
         binding.btnPublish.setOnClickListener {
             if (validateInput()) {
                 saveNews(News.STATUS_PUBLISHED)
@@ -63,6 +88,17 @@ class AddNewsActivity : AppCompatActivity() {
                 saveNews(News.STATUS_DRAFT)
             }
         }
+    }
+
+    private fun openImagePicker() {
+        imagePickerLauncher.launch("image/*")
+    }
+
+    private fun displaySelectedImage(uri: Uri) {
+        binding.ivCoverImage.setImageURI(uri)
+        binding.ivCoverImage.visible()
+        binding.btnChangeImage.visible()
+        binding.layoutUploadPlaceholder.gone()
     }
 
     private fun validateInput(): Boolean {
@@ -96,12 +132,17 @@ class AddNewsActivity : AppCompatActivity() {
     }
 
     private fun saveNews(status: String) {
+        val imageBase64 = selectedImageUri
+            ?.let { uri -> ImageEncodeUtils.uriToBase64(this, uri) }
+            .orEmpty()
+
         val news = News(
             title = binding.etTitle.text.toString().trim(),
             category = selectedCategory,
             content = binding.etContent.text.toString().trim(),
             tags = binding.etTags.text.toString().trim(),
-            coverImageUrl = "", // Mock - no Firebase Storage
+            // NOTE: project already uses Base64 in coverImageUrl
+            coverImageUrl = imageBase64,
             status = status
         )
 
@@ -135,4 +176,3 @@ class AddNewsActivity : AppCompatActivity() {
         }
     }
 }
-
