@@ -10,6 +10,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mountadmin.R
+import com.example.mountadmin.data.model.MountainWeather
+import com.example.mountadmin.data.model.WeatherStatus
 import com.example.mountadmin.databinding.FragmentGunungAdminDashboardBinding
 import com.example.mountadmin.ui.gunungadmin.mountain.GunungAdminMountainFragment
 import com.example.mountadmin.utils.ImageDisplayUtils
@@ -82,6 +84,14 @@ class GunungAdminDashboardFragment : Fragment() {
 
         binding.tvViewAll.setOnClickListener {
             navigateToRegistrations()
+        }
+
+        // Weather refresh button
+        binding.weatherWidget.btnRefreshWeather.setOnClickListener {
+            if (mountainId.isNotEmpty()) {
+                viewModel.refreshWeather(mountainId)
+                Snackbar.make(binding.root, "Refreshing weather...", Snackbar.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -225,6 +235,107 @@ class GunungAdminDashboardFragment : Fragment() {
                 Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG).show()
                 viewModel.clearError()
             }
+        }
+
+        // Weather observers
+        viewModel.isWeatherLoading.observe(viewLifecycleOwner) { isLoading ->
+            if (isLoading) {
+                binding.weatherWidget.progressWeather.visible()
+                binding.weatherWidget.layoutWeatherContent.gone()
+                binding.weatherWidget.tvWeatherError.gone()
+            } else {
+                binding.weatherWidget.progressWeather.gone()
+            }
+        }
+
+        viewModel.weather.observe(viewLifecycleOwner) { weather ->
+            weather?.let {
+                updateWeatherWidget(it)
+            }
+        }
+
+        viewModel.weatherError.observe(viewLifecycleOwner) { error ->
+            error?.let {
+                binding.weatherWidget.tvWeatherError.text = it
+                binding.weatherWidget.tvWeatherError.visible()
+                binding.weatherWidget.layoutWeatherContent.gone()
+            }
+        }
+    }
+
+    /**
+     * Update weather widget with data
+     */
+    private fun updateWeatherWidget(weather: MountainWeather) {
+        binding.weatherWidget.layoutWeatherContent.visible()
+        binding.weatherWidget.tvWeatherError.gone()
+
+        // Temperature
+        binding.weatherWidget.tvTemperature.text = "${weather.temperature.toInt()}°C"
+
+        // Wind & Humidity
+        binding.weatherWidget.tvWindSpeed.text = "${weather.windSpeed.toInt()} km/h"
+        binding.weatherWidget.tvHumidity.text = "${weather.humidity}%"
+        binding.weatherWidget.tvCondition.text = weather.weatherDescription
+
+        // Weather status badge
+        binding.weatherWidget.chipWeatherStatus.text = weather.weatherStatus.displayName
+        binding.weatherWidget.chipWeatherStatus.chipBackgroundColor =
+            ContextCompat.getColorStateList(requireContext(), getWeatherColorRes(weather.weatherStatus))
+        binding.weatherWidget.chipWeatherStatus.chipIcon =
+            ContextCompat.getDrawable(requireContext(), getWeatherIconRes(weather.weatherStatus))
+
+        // Weather icon (main)
+        binding.weatherWidget.ivWeatherIcon.setImageResource(getWeatherIconRes(weather.weatherStatus))
+        binding.weatherWidget.ivWeatherIcon.setColorFilter(
+            ContextCompat.getColor(requireContext(), getWeatherColorRes(weather.weatherStatus))
+        )
+
+        // Warning banner (show for severe conditions)
+        if (weather.weatherStatus.level >= 3) {
+            binding.weatherWidget.layoutWeatherWarning.visible()
+            binding.weatherWidget.tvWeatherWarning.text = getWeatherWarningMessage(weather)
+        } else {
+            binding.weatherWidget.layoutWeatherWarning.gone()
+        }
+    }
+
+    private fun getWeatherColorRes(status: WeatherStatus): Int {
+        return when (status) {
+            WeatherStatus.CLEAR -> R.color.weather_clear
+            WeatherStatus.CLOUDY -> R.color.weather_cloudy
+            WeatherStatus.FOG -> R.color.weather_fog
+            WeatherStatus.DRIZZLE -> R.color.weather_fog
+            WeatherStatus.RAIN -> R.color.weather_rain
+            WeatherStatus.HEAVY_RAIN -> R.color.weather_rain
+            WeatherStatus.SNOW -> R.color.weather_rain
+            WeatherStatus.THUNDERSTORM -> R.color.weather_storm
+            WeatherStatus.STRONG_WIND -> R.color.weather_wind
+        }
+    }
+
+    private fun getWeatherIconRes(status: WeatherStatus): Int {
+        return when (status) {
+            WeatherStatus.CLEAR -> R.drawable.ic_weather_clear
+            WeatherStatus.CLOUDY -> R.drawable.ic_weather_cloudy
+            WeatherStatus.FOG -> R.drawable.ic_weather_cloudy
+            WeatherStatus.DRIZZLE -> R.drawable.ic_weather_rain
+            WeatherStatus.RAIN -> R.drawable.ic_weather_rain
+            WeatherStatus.HEAVY_RAIN -> R.drawable.ic_weather_rain
+            WeatherStatus.SNOW -> R.drawable.ic_weather_rain
+            WeatherStatus.THUNDERSTORM -> R.drawable.ic_weather_rain
+            WeatherStatus.STRONG_WIND -> R.drawable.ic_wind
+        }
+    }
+
+    private fun getWeatherWarningMessage(weather: MountainWeather): String {
+        return when (weather.weatherStatus) {
+            WeatherStatus.HEAVY_RAIN -> "Heavy rain expected. Consider advising hikers to postpone."
+            WeatherStatus.THUNDERSTORM -> "Thunderstorm alert! Hiking is not recommended."
+            WeatherStatus.STRONG_WIND -> "Strong wind warning (${weather.windSpeed.toInt()} km/h). Advise hikers to be cautious."
+            WeatherStatus.RAIN -> "Rain expected. Hikers should prepare appropriate gear."
+            WeatherStatus.SNOW -> "Snow conditions. Ensure hikers have proper equipment."
+            else -> "Weather conditions may affect hiking safety."
         }
     }
 

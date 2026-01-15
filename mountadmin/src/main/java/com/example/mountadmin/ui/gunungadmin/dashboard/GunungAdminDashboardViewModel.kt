@@ -7,8 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mountadmin.data.model.HikingRoute
 import com.example.mountadmin.data.model.Mountain
+import com.example.mountadmin.data.model.MountainWeather
 import com.example.mountadmin.data.model.Registration
 import com.example.mountadmin.data.repository.RouteCapacityRepository
+import com.example.mountadmin.data.repository.WeatherRepository
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -17,6 +19,7 @@ class GunungAdminDashboardViewModel : ViewModel() {
 
     private val firestore = FirebaseFirestore.getInstance()
     private val capacityRepository = RouteCapacityRepository()
+    private val weatherRepository = WeatherRepository()
 
     private val _mountain = MutableLiveData<Mountain?>()
     val mountain: LiveData<Mountain?> = _mountain
@@ -42,6 +45,16 @@ class GunungAdminDashboardViewModel : ViewModel() {
     private val _routeRegistrationChart = MutableLiveData<List<RouteRegistrationCount>>(emptyList())
     val routeRegistrationChart: LiveData<List<RouteRegistrationCount>> = _routeRegistrationChart
 
+    // Weather data
+    private val _weather = MutableLiveData<MountainWeather?>()
+    val weather: LiveData<MountainWeather?> = _weather
+
+    private val _isWeatherLoading = MutableLiveData(false)
+    val isWeatherLoading: LiveData<Boolean> = _isWeatherLoading
+
+    private val _weatherError = MutableLiveData<String?>()
+    val weatherError: LiveData<String?> = _weatherError
+
     private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading
 
@@ -62,6 +75,40 @@ class GunungAdminDashboardViewModel : ViewModel() {
 
         // Load chart data
         loadRouteRegistrationChart(mountainId)
+
+        // Load weather data
+        loadWeatherData(mountainId)
+    }
+
+    /**
+     * Load weather data for the mountain
+     */
+    fun loadWeatherData(mountainId: String) {
+        viewModelScope.launch {
+            _isWeatherLoading.value = true
+            _weatherError.value = null
+
+            val result = weatherRepository.getWeatherForMountain(mountainId)
+
+            result.fold(
+                onSuccess = { weatherData ->
+                    _weather.value = weatherData
+                },
+                onFailure = { error ->
+                    _weatherError.value = error.message ?: "Failed to load weather"
+                    _weather.value = null
+                }
+            )
+
+            _isWeatherLoading.value = false
+        }
+    }
+
+    /**
+     * Refresh weather data only
+     */
+    fun refreshWeather(mountainId: String) {
+        loadWeatherData(mountainId)
     }
 
     private fun loadMountainDataWithCapacity(mountainId: String) {

@@ -91,6 +91,34 @@ class WeatherRepository {
     }
 
     /**
+     * Ambil cuaca untuk satu gunung spesifik berdasarkan mountainId
+     * Digunakan oleh GunungAdmin untuk melihat cuaca gunung yang dikelolanya
+     */
+    suspend fun getWeatherForMountain(mountainId: String): Result<MountainWeather> {
+        return try {
+            // 1. Ambil data gunung dari Firestore
+            val mountainDoc = firestore.collection("mountains")
+                .document(mountainId)
+                .get()
+                .await()
+
+            val mountain = mountainDoc.toObject(Mountain::class.java)?.copy(mountainId = mountainDoc.id)
+                ?: return Result.failure(Exception("Mountain not found"))
+
+            // 2. Fetch cuaca untuk gunung tersebut
+            val weather = fetchWeatherForMountain(mountain)
+                ?: return Result.failure(Exception("Failed to fetch weather data"))
+
+            Log.d(TAG, "Fetched weather for ${mountain.name}: ${weather.weatherStatus}")
+            Result.success(weather)
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Error fetching weather for mountainId $mountainId: ${e.message}", e)
+            Result.failure(e)
+        }
+    }
+
+    /**
      * Fetch cuaca untuk satu gunung
      */
     private suspend fun fetchWeatherForMountain(mountain: Mountain): MountainWeather? {
