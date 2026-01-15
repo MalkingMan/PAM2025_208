@@ -8,11 +8,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mounttrack.R
 import com.example.mounttrack.databinding.ActivityMountainsBinding
 import com.example.mounttrack.ui.dashboard.DashboardActivity
+import com.example.mounttrack.ui.mountains.detail.MountainDetailActivity
 import com.example.mounttrack.ui.news.NewsActivity
-import com.example.mounttrack.ui.registration.MountainRegistrationActivity
 import com.example.mounttrack.ui.settings.SettingsActivity
 import com.example.mounttrack.ui.status.StatusActivity
-import com.example.mounttrack.utils.Constants
 import com.example.mounttrack.utils.gone
 import com.example.mounttrack.utils.visible
 
@@ -35,10 +34,10 @@ class MountainsActivity : AppCompatActivity() {
 
     private fun setupRecyclerView() {
         mountainsAdapter = MountainsAdapter { mountain ->
-            // Navigate to MountainRegistrationActivity
-            val intent = Intent(this, MountainRegistrationActivity::class.java).apply {
-                putExtra(Constants.EXTRA_MOUNTAIN_ID, mountain.mountainId)
-                putExtra(Constants.EXTRA_MOUNTAIN_NAME, mountain.name)
+            // Navigate to MountainDetailActivity
+            val intent = Intent(this, MountainDetailActivity::class.java).apply {
+                putExtra(MountainDetailActivity.EXTRA_MOUNTAIN_ID, mountain.mountainId)
+                putExtra(MountainDetailActivity.EXTRA_MOUNTAIN_NAME, mountain.name)
             }
             startActivity(intent)
         }

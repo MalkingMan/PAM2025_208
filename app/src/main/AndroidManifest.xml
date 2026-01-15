@@ -77,6 +77,11 @@
             android:theme="@style/Theme.MountTrack"
             android:windowSoftInputMode="adjustResize" />
 
+        <activity
+            android:name=".ui.mountains.detail.MountainDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MountTrack" />
+
     </application>
 
 </manifest>

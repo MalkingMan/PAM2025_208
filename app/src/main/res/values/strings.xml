@@ -118,4 +118,20 @@
     <string name="send_reset_email">Send Reset Email</string>
     <string name="password_reset_email_sent">Password reset email sent! Please check your inbox.</string>
     <string name="error_send_reset_email">Failed to send reset email. Please try again.</string>
+
+    <!-- Mountain Detail -->
+    <string name="about_mountain">Tentang Gunung</string>
+    <string name="hiking_routes">Jalur Pendakian</string>
+    <string name="register_for_hiking">Daftar Pendakian</string>
+    <string name="route_count_format">%d jalur</string>
+    <string name="elevation_format">%,d m</string>
+    <string name="open">OPEN</string>
+    <string name="closed">CLOSED</string>
+    <string name="full">FULL</string>
+    <string name="limited">LIMITED</string>
+    <string name="route_closed">Jalur ditutup sementara</string>
+    <string name="route_full_format">Penuh • 0 dari %d slot</string>
+    <string name="route_limited_format">%d dari %d slot tersisa</string>
+    <string name="route_available_format">%d dari %d slot tersedia</string>
+    <string name="default_mountain_description">Gunung ini menawarkan pengalaman pendakian yang menakjubkan dengan pemandangan alam yang indah. Cocok untuk pendaki dengan berbagai tingkat pengalaman.</string>
 </resources>

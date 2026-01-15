@@ -29,14 +29,23 @@ import java.util.TimeZone
 
 class MountainRegistrationActivity : AppCompatActivity() {
 
+    companion object {
+        const val EXTRA_MOUNTAIN_ID = "extra_mountain_id"
+        const val EXTRA_MOUNTAIN_NAME = "extra_mountain_name"
+        const val EXTRA_ROUTE_NAME = "extra_route_name"
+        const val EXTRA_ROUTE_ID = "extra_route_id"
+    }
+
     private lateinit var binding: ActivityMountainRegistrationBinding
     private val viewModel: RegistrationViewModel by viewModels()
 
     private var mountainId: String = ""
     private var mountainName: String = ""
     private var selectedRoute: String = ""
-    private var selectedRouteId: String = ""  // Added for capacity tracking
+    private var selectedRouteId: String = ""
     private var idCardUri: String = ""
+    private var preSelectedRouteName: String = ""
+    private var preSelectedRouteId: String = ""
 
     private val calendar = Calendar.getInstance()
     private val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
@@ -55,9 +64,15 @@ class MountainRegistrationActivity : AppCompatActivity() {
         binding = ActivityMountainRegistrationBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Get mountain data from intent
-        mountainId = intent.getStringExtra(Constants.EXTRA_MOUNTAIN_ID) ?: ""
-        mountainName = intent.getStringExtra(Constants.EXTRA_MOUNTAIN_NAME) ?: ""
+        // Get mountain data from intent (support both old and new extras)
+        mountainId = intent.getStringExtra(EXTRA_MOUNTAIN_ID) 
+            ?: intent.getStringExtra(Constants.EXTRA_MOUNTAIN_ID) ?: ""
+        mountainName = intent.getStringExtra(EXTRA_MOUNTAIN_NAME) 
+            ?: intent.getStringExtra(Constants.EXTRA_MOUNTAIN_NAME) ?: ""
+        
+        // Get pre-selected route if coming from Mountain Detail
+        preSelectedRouteName = intent.getStringExtra(EXTRA_ROUTE_NAME) ?: ""
+        preSelectedRouteId = intent.getStringExtra(EXTRA_ROUTE_ID) ?: ""
 
         setupViews()
         setupClickListeners()
@@ -225,9 +240,18 @@ class MountainRegistrationActivity : AppCompatActivity() {
                 binding.actvRoute.setOnItemClickListener { _, _, position, _ ->
                     val selectedRouteObj = routes[position]
                     selectedRoute = selectedRouteObj.name
-                    selectedRouteId = selectedRouteObj.routeId  // Store routeId for capacity tracking
-                    // Set display text to only show route name
+                    selectedRouteId = selectedRouteObj.routeId
                     binding.actvRoute.setText(selectedRouteObj.name, false)
+                }
+
+                // Pre-select route if coming from Mountain Detail
+                if (preSelectedRouteName.isNotBlank()) {
+                    val preSelectedRouteObj = routes.find { it.name == preSelectedRouteName || it.routeId == preSelectedRouteId }
+                    preSelectedRouteObj?.let {
+                        selectedRoute = it.name
+                        selectedRouteId = it.routeId
+                        binding.actvRoute.setText(it.name, false)
+                    }
                 }
             }
         }
