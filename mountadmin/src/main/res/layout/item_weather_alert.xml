@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardBackgroundColor="@color/background_card"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- Weather Icon -->
+        <ImageView
+            android:id="@+id/ivWeatherIcon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="Weather icon"
+            android:padding="8dp"
+            android:background="@drawable/bg_weather_icon"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:src="@drawable/ic_weather_rain" />
+
+        <!-- Mountain Name -->
+        <TextView
+            android:id="@+id/tvMountainName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_marginEnd="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/chipWeatherStatus"
+            app:layout_constraintStart_toEndOf="@id/ivWeatherIcon"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Gunung Merbabu" />
+
+        <!-- Weather Status Badge -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipWeatherStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            app:chipCornerRadius="14dp"
+            app:chipMinHeight="28dp"
+            app:chipIconSize="14dp"
+            app:chipIconTint="@color/white"
+            app:chipBackgroundColor="@color/gunung_error"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Heavy Rain"
+            tools:chipIcon="@drawable/ic_weather_rain" />
+
+        <!-- Weather Details Row -->
+        <LinearLayout
+            android:id="@+id/layoutWeatherDetails"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="6dp"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toEndOf="@id/ivWeatherIcon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvMountainName">
+
+            <!-- Temperature -->
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_temperature"
+                android:contentDescription="Temperature"
+                app:tint="@color/text_secondary" />
+
+            <TextView
+                android:id="@+id/tvTemperature"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp"
+                tools:text="18°C" />
+
+            <!-- Divider -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:text="|"
+                android:textColor="#555555"
+                android:textSize="13sp" />
+
+            <!-- Wind Speed -->
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_wind"
+                android:contentDescription="Wind"
+                app:tint="@color/text_secondary" />
+
+            <TextView
+                android:id="@+id/tvWindSpeed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp"
+                tools:text="45 km/h" />
+
+            <!-- Divider -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:text="|"
+                android:textColor="#555555"
+                android:textSize="13sp" />
+
+            <!-- Humidity -->
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_humidity"
+                android:contentDescription="Humidity"
+                app:tint="@color/text_secondary" />
+
+            <TextView
+                android:id="@+id/tvHumidity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp"
+                tools:text="85%" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

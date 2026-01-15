@@ -63,4 +63,18 @@
     <color name="black">#000000</color>
     <color name="transparent">#00000000</color>
     <color name="divider">#424242</color>
+
+    <!-- Weather Alert Colors -->
+    <color name="weather_clear">#2ECC71</color>
+    <color name="weather_clear_bg">#332ECC71</color>
+    <color name="weather_cloudy">#3498DB</color>
+    <color name="weather_cloudy_bg">#333498DB</color>
+    <color name="weather_fog">#F39C12</color>
+    <color name="weather_fog_bg">#33F39C12</color>
+    <color name="weather_rain">#E74C3C</color>
+    <color name="weather_rain_bg">#33E74C3C</color>
+    <color name="weather_storm">#9B59B6</color>
+    <color name="weather_storm_bg">#339B59B6</color>
+    <color name="weather_wind">#E67E22</color>
+    <color name="weather_wind_bg">#33E67E22</color>
 </resources>

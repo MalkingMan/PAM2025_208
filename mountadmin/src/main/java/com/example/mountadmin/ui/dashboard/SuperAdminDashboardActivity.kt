@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mountadmin.R
 import com.example.mountadmin.databinding.ActivitySuperAdminDashboardBinding
 import com.example.mountadmin.ui.admin.ManageAdminsActivity
@@ -21,6 +22,7 @@ import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
+import com.google.android.material.snackbar.Snackbar
 import kotlin.math.ceil
 import kotlin.math.max
 
@@ -28,6 +30,7 @@ class SuperAdminDashboardActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySuperAdminDashboardBinding
     private val viewModel: DashboardViewModel by viewModels()
+    private lateinit var weatherAdapter: WeatherAlertAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +39,7 @@ class SuperAdminDashboardActivity : AppCompatActivity() {
 
         setupBottomNavigation()
         setupChart()
+        setupWeatherAlerts()
         observeViewModel()
         viewModel.loadDashboardData()
     }
@@ -102,6 +106,22 @@ class SuperAdminDashboardActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupWeatherAlerts() {
+        weatherAdapter = WeatherAlertAdapter()
+
+        binding.rvWeatherAlerts.apply {
+            layoutManager = LinearLayoutManager(this@SuperAdminDashboardActivity)
+            adapter = weatherAdapter
+            setHasFixedSize(false)
+        }
+
+        // Refresh button click
+        binding.btnRefreshWeather.setOnClickListener {
+            viewModel.refreshWeather()
+            Snackbar.make(binding.root, "Refreshing weather data...", Snackbar.LENGTH_SHORT).show()
+        }
+    }
+
     private fun observeViewModel() {
         viewModel.isLoading.observe(this) { isLoading ->
             if (isLoading) binding.progressBar.visible() else binding.progressBar.gone()
@@ -115,6 +135,36 @@ class SuperAdminDashboardActivity : AppCompatActivity() {
             updateChart(stats.mountainRegistrations.map {
                 Pair(it.mountainName, it.count.toFloat())
             })
+        }
+
+        // Weather observers
+        viewModel.isWeatherLoading.observe(this) { isLoading ->
+            if (isLoading) {
+                binding.progressWeather.visible()
+                binding.tvWeatherError.gone()
+            } else {
+                binding.progressWeather.gone()
+            }
+        }
+
+        viewModel.weatherAlerts.observe(this) { weatherList ->
+            if (weatherList.isEmpty()) {
+                binding.rvWeatherAlerts.gone()
+                binding.tvNoWeather.visible()
+            } else {
+                binding.rvWeatherAlerts.visible()
+                binding.tvNoWeather.gone()
+                weatherAdapter.submitList(weatherList)
+            }
+        }
+
+        viewModel.weatherError.observe(this) { error ->
+            error?.let {
+                binding.tvWeatherError.text = it
+                binding.tvWeatherError.visible()
+                binding.rvWeatherAlerts.gone()
+                binding.tvNoWeather.gone()
+            } ?: binding.tvWeatherError.gone()
         }
     }
 

@@ -260,6 +260,98 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Weather Alerts Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_weather_cloudy"
+                    app:tint="@color/primary"
+                    android:contentDescription="Weather" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="Weather Alerts"
+                    android:textColor="@color/text_primary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/btnRefreshWeather"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:padding="4dp"
+                    android:src="@drawable/ic_refresh"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    app:tint="@color/text_secondary"
+                    android:contentDescription="Refresh weather" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Real-time weather conditions for all mountains"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
+
+            <!-- Weather Loading -->
+            <ProgressBar
+                android:id="@+id/progressWeather"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                style="?android:attr/progressBarStyleSmall" />
+
+            <!-- Weather Error -->
+            <TextView
+                android:id="@+id/tvWeatherError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:padding="12dp"
+                android:background="@drawable/bg_weather_icon"
+                android:textColor="@color/weather_rain"
+                android:textSize="13sp"
+                android:gravity="center"
+                android:visibility="gone"
+                tools:text="Failed to load weather data" />
+
+            <!-- No Weather Data -->
+            <TextView
+                android:id="@+id/tvNoWeather"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:padding="24dp"
+                android:text="No mountain data available"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp"
+                android:gravity="center"
+                android:visibility="gone" />
+
+            <!-- Weather Alerts RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvWeatherAlerts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:nestedScrollingEnabled="false"
+                tools:listitem="@layout/item_weather_alert"
+                tools:itemCount="3" />
+
         </LinearLayout>
 
     </ScrollView>
