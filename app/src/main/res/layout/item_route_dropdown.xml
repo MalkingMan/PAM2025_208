@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp"
     android:background="?attr/selectableItemBackground">
 
+    <!-- Row 1: Route Name + Difficulty Badge -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,25 +29,79 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
             android:background="@drawable/bg_difficulty_badge"
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:textStyle="bold"
             android:text="Moderate" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/tvRouteInfo"
-        android:layout_width="wrap_content"
+    <!-- Row 2: Capacity Progress Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:textColor="@color/text_secondary"
-        android:textSize="12sp"
-        android:text="10 km • 6-8 hours"
-        android:visibility="gone" />
+        android:orientation="vertical"
+        android:layout_marginTop="10dp">
+
+        <!-- Progress Bar Container -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ProgressBar
+                android:id="@+id/progressCapacity"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:max="100"
+                android:progress="50"
+                android:progressDrawable="@drawable/bg_progress_capacity" />
+
+        </FrameLayout>
+
+        <!-- Capacity Info Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="6dp"
+            android:gravity="center_vertical">
+
+            <!-- Icon + Capacity Text -->
+            <ImageView
+                android:id="@+id/ivCapacityIcon"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/ic_check_small"
+                android:contentDescription="Status" />
+
+            <TextView
+                android:id="@+id/tvCapacityInfo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:textSize="12sp"
+                android:text="148 of 150 slots available" />
+
+            <!-- Status Badge -->
+            <TextView
+                android:id="@+id/tvRouteStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingTop="3dp"
+                android:paddingBottom="3dp"
+                android:textSize="10sp"
+                android:textAllCaps="true"
+                android:textStyle="bold"
+                android:text="AVAILABLE"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>
-
