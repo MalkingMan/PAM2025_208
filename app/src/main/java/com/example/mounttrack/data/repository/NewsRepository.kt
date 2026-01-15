@@ -4,6 +4,10 @@ import android.util.Log
 import com.example.mounttrack.data.firebase.FirebaseHelper
 import com.example.mounttrack.data.model.HikingNews
 import com.google.firebase.FirebaseApp
+import com.google.firebase.firestore.ListenerRegistration
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 class NewsRepository {
@@ -13,6 +17,59 @@ class NewsRepository {
     }
 
     private val firestore = FirebaseHelper.firestore
+    private var newsListener: ListenerRegistration? = null
+
+    /**
+     * Real-time stream of published news using Firestore snapshot listener.
+     * Automatically updates when news data changes in Firestore.
+     */
+    fun getNewsRealtime(limit: Int = 100): Flow<List<HikingNews>> = callbackFlow {
+        Log.d(TAG, "Starting real-time news listener...")
+
+        val listener = firestore.collection(FirebaseHelper.COLLECTION_NEWS)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    Log.e(TAG, "Real-time news listener error: ${error.message}", error)
+                    trySend(emptyList())
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null) {
+                    Log.d(TAG, "Real-time news update: ${snapshot.documents.size} documents")
+                    val newsList = snapshot.documents.mapNotNull { doc ->
+                        try {
+                            val mapped = doc.toObject(HikingNews::class.java)
+                            if (mapped != null) {
+                                if (mapped.newsId.isBlank() && mapped.id.isBlank()) {
+                                    mapped.newsId = doc.id
+                                }
+                            }
+                            mapped
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Error parsing news document ${doc.id}: ${e.message}")
+                            null
+                        }
+                    }.filter { isNewsPublished(it) }
+                        .sortedByDescending { newsSortKeySeconds(it) }
+                        .take(limit)
+
+                    Log.d(TAG, "Filtered ${newsList.size} published news")
+                    trySend(newsList)
+                }
+            }
+
+        newsListener = listener
+
+        awaitClose {
+            Log.d(TAG, "Closing real-time news listener")
+            listener.remove()
+        }
+    }
+
+    fun removeListener() {
+        newsListener?.remove()
+        newsListener = null
+    }
 
     private fun logFirebaseConfigOnce() {
         try {

@@ -7,7 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mounttrack.data.model.Mountain
 import com.example.mounttrack.data.repository.MountainRepository
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class MountainsViewModel : ViewModel() {
 
@@ -27,34 +29,41 @@ class MountainsViewModel : ViewModel() {
     val error: LiveData<String?> = _error
 
     init {
-        loadMountains()
+        startRealtimeListener()
     }
 
-    fun loadMountains() {
+    /**
+     * Start real-time listener for mountains.
+     * Data automatically updates when admin adds/edits/deletes mountains.
+     */
+    private fun startRealtimeListener() {
+        Log.d(TAG, "Starting real-time mountains listener...")
         _isLoading.value = true
         _error.value = null
 
-        viewModelScope.launch {
-            Log.d(TAG, "Loading mountains...")
-            val result = mountainRepository.getMountains()
-            result.fold(
-                onSuccess = { mountainList ->
-                    Log.d(TAG, "Loaded ${mountainList.size} mountains")
-                    _mountains.value = mountainList
-                    _isLoading.value = false
-                },
-                onFailure = { exception ->
-                    Log.e(TAG, "Error loading mountains: ${exception.message}")
-                    _error.value = exception.message ?: "Failed to load mountains"
-                    _mountains.value = emptyList()
-                    _isLoading.value = false
-                }
-            )
-        }
+        mountainRepository.getMountainsRealtime()
+            .onEach { mountainList ->
+                Log.d(TAG, "Real-time update: ${mountainList.size} mountains")
+                _mountains.value = mountainList
+                _isLoading.value = false
+            }
+            .catch { exception ->
+                Log.e(TAG, "Error in mountains real-time stream: ${exception.message}")
+                _error.value = exception.message ?: "Failed to load mountains"
+                _mountains.value = emptyList()
+                _isLoading.value = false
+            }
+            .launchIn(viewModelScope)
     }
 
     fun refreshMountains() {
-        loadMountains()
+        Log.d(TAG, "Manual refresh requested - real-time already active")
+        // Real-time listener is already active
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        Log.d(TAG, "ViewModel cleared, removing listener")
+        mountainRepository.removeListener()
     }
 }
-

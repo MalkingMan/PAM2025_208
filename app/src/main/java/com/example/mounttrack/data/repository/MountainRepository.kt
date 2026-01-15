@@ -4,6 +4,10 @@ import android.util.Log
 import com.example.mounttrack.data.firebase.FirebaseHelper
 import com.example.mounttrack.data.model.Mountain
 import com.example.mounttrack.data.model.HikingRoute
+import com.google.firebase.firestore.ListenerRegistration
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 class MountainRepository {
@@ -13,6 +17,109 @@ class MountainRepository {
     }
 
     private val firestore = FirebaseHelper.firestore
+    private var mountainsListener: ListenerRegistration? = null
+
+    /**
+     * Real-time stream of mountains using Firestore snapshot listener.
+     * Automatically updates when data changes in Firestore.
+     */
+    fun getMountainsRealtime(): Flow<List<Mountain>> = callbackFlow {
+        Log.d(TAG, "Starting real-time mountains listener...")
+
+        val listener = firestore.collection(FirebaseHelper.COLLECTION_MOUNTAINS)
+            .whereEqualTo("isActive", true)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    Log.e(TAG, "Real-time listener error: ${error.message}", error)
+                    trySend(emptyList())
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null) {
+                    Log.d(TAG, "Real-time update: ${snapshot.documents.size} mountains")
+                    val mountains = snapshot.documents.mapNotNull { doc ->
+                        try {
+                            parseMountainDocument(doc.id, doc.data)
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Error parsing mountain: ${e.message}")
+                            null
+                        }
+                    }
+                    trySend(mountains)
+                }
+            }
+
+        mountainsListener = listener
+
+        awaitClose {
+            Log.d(TAG, "Closing real-time mountains listener")
+            listener.remove()
+        }
+    }
+
+    /**
+     * Real-time stream of popular mountains (first 4).
+     */
+    fun getPopularMountainsRealtime(): Flow<List<Mountain>> = callbackFlow {
+        val listener = firestore.collection(FirebaseHelper.COLLECTION_MOUNTAINS)
+            .whereEqualTo("isActive", true)
+            .limit(4)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    Log.e(TAG, "Popular mountains listener error: ${error.message}", error)
+                    trySend(emptyList())
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null) {
+                    val mountains = snapshot.documents.mapNotNull { doc ->
+                        try {
+                            parseMountainDocument(doc.id, doc.data)
+                        } catch (e: Exception) {
+                            null
+                        }
+                    }
+                    trySend(mountains)
+                }
+            }
+
+        awaitClose { listener.remove() }
+    }
+
+    private fun parseMountainDocument(docId: String, data: Map<String, Any>?): Mountain? {
+        if (data == null) return null
+
+        val routesData = (data["routes"] as? List<Map<String, Any>>) ?: emptyList()
+        val routesMapped = routesData.map { routeMap ->
+            mapOf(
+                "routeId" to (routeMap["routeId"] ?: ""),
+                "name" to (routeMap["name"] ?: ""),
+                "difficulty" to (routeMap["difficulty"] ?: "Moderate"),
+                "estimatedTime" to (routeMap["estimatedTime"] ?: ""),
+                "distance" to (routeMap["distance"] ?: ""),
+                "maxCapacity" to (routeMap["maxCapacity"] ?: 0L),
+                "usedCapacity" to (routeMap["usedCapacity"] ?: 0L),
+                "status" to (routeMap["status"] ?: HikingRoute.STATUS_OPEN)
+            )
+        }
+
+        return Mountain(
+            mountainId = docId,
+            name = data["name"] as? String ?: "",
+            province = data["province"] as? String ?: "",
+            country = data["country"] as? String ?: "Indonesia",
+            elevation = (data["elevation"] as? Long)?.toInt() ?: 0,
+            description = data["description"] as? String ?: "",
+            imageUrl = data["imageUrl"] as? String ?: "",
+            routes = routesMapped,
+            isActive = data["isActive"] as? Boolean ?: true
+        )
+    }
+
+    fun removeListener() {
+        mountainsListener?.remove()
+        mountainsListener = null
+    }
 
     suspend fun getMountains(): Result<List<Mountain>> {
         return try {

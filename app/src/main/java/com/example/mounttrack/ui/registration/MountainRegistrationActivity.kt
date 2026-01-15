@@ -35,6 +35,7 @@ class MountainRegistrationActivity : AppCompatActivity() {
     private var mountainId: String = ""
     private var mountainName: String = ""
     private var selectedRoute: String = ""
+    private var selectedRouteId: String = ""  // Added for capacity tracking
     private var idCardUri: String = ""
 
     private val calendar = Calendar.getInstance()
@@ -224,6 +225,7 @@ class MountainRegistrationActivity : AppCompatActivity() {
                 binding.actvRoute.setOnItemClickListener { _, _, position, _ ->
                     val selectedRouteObj = routes[position]
                     selectedRoute = selectedRouteObj.name
+                    selectedRouteId = selectedRouteObj.routeId  // Store routeId for capacity tracking
                     // Set display text to only show route name
                     binding.actvRoute.setText(selectedRouteObj.name, false)
                 }
@@ -318,6 +320,7 @@ class MountainRegistrationActivity : AppCompatActivity() {
             phone = phone,
             email = email,
             route = route,
+            routeId = selectedRouteId,  // Pass routeId for capacity tracking
             idCardUri = idCardUri
         )
     }

@@ -9,6 +9,9 @@ import com.example.mounttrack.data.model.HikingNews
 import com.example.mounttrack.data.model.Mountain
 import com.example.mounttrack.data.repository.MountainRepository
 import com.example.mounttrack.data.repository.NewsRepository
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class DashboardViewModel : ViewModel() {
@@ -30,64 +33,62 @@ class DashboardViewModel : ViewModel() {
     val isLoading: LiveData<Boolean> = _isLoading
 
     init {
-        loadPopularMountains()
-        loadHikingNews()
+        startRealtimeListeners()
     }
 
-    private fun loadPopularMountains() {
-        viewModelScope.launch {
-            _isLoading.value = true
-            Log.d(TAG, "Loading popular mountains...")
+    /**
+     * Start real-time listeners for mountains and news.
+     * Data will automatically update when admin makes changes.
+     */
+    private fun startRealtimeListeners() {
+        Log.d(TAG, "Starting real-time listeners...")
+        _isLoading.value = true
 
-            val result = mountainRepository.getPopularMountains()
-            result.fold(
-                onSuccess = { mountains ->
-                    Log.d(TAG, "Loaded ${mountains.size} popular mountains")
-                    _popularMountains.value = mountains
-                },
-                onFailure = { exception ->
-                    Log.e(TAG, "Error loading popular mountains: ${exception.message}")
-                    _popularMountains.value = emptyList()
-                }
-            )
-            _isLoading.value = false
-        }
-    }
-
-    private fun loadHikingNews() {
-        viewModelScope.launch {
-            Log.d(TAG, "========== LOADING HIKING NEWS ==========")
-            _isLoading.value = true
-
-            try {
-                val result = newsRepository.getLatestNews(10)
-                result.fold(
-                    onSuccess = { news ->
-                        Log.d(TAG, "SUCCESS: Loaded ${news.size} hiking news")
-                        news.forEachIndexed { index, item ->
-                            Log.d(TAG, "News[$index]: title='${item.title}', id='${item.actualId}'")
-                        }
-                        _hikingNews.postValue(news)
-                        Log.d(TAG, "Posted news to LiveData")
-                    },
-                    onFailure = { exception ->
-                        Log.e(TAG, "FAILURE loading hiking news: ${exception.message}", exception)
-                        _hikingNews.postValue(emptyList())
-                    }
-                )
-            } catch (e: Exception) {
-                Log.e(TAG, "EXCEPTION in loadHikingNews: ${e.message}", e)
-                _hikingNews.postValue(emptyList())
+        // Real-time popular mountains listener
+        mountainRepository.getPopularMountainsRealtime()
+            .onEach { mountains ->
+                Log.d(TAG, "Real-time update: ${mountains.size} popular mountains")
+                _popularMountains.value = mountains
+                _isLoading.value = false
             }
+            .catch { e ->
+                Log.e(TAG, "Error in mountains real-time stream: ${e.message}")
+                _popularMountains.value = emptyList()
+                _isLoading.value = false
+            }
+            .launchIn(viewModelScope)
 
-            _isLoading.value = false
-            Log.d(TAG, "========== END LOADING HIKING NEWS ==========")
-        }
+        // Real-time news listener
+        newsRepository.getNewsRealtime(10)
+            .onEach { news ->
+                Log.d(TAG, "========== REAL-TIME NEWS UPDATE ==========")
+                Log.d(TAG, "Received ${news.size} news items")
+                news.forEachIndexed { index, item ->
+                    Log.d(TAG, "News[$index]: title='${item.title}', id='${item.actualId}'")
+                }
+                _hikingNews.value = news
+                Log.d(TAG, "Posted news to LiveData")
+                Log.d(TAG, "=============================================")
+            }
+            .catch { e ->
+                Log.e(TAG, "Error in news real-time stream: ${e.message}")
+                _hikingNews.value = emptyList()
+            }
+            .launchIn(viewModelScope)
     }
 
+    /**
+     * Legacy method for manual refresh (still works, but not needed with real-time)
+     */
     fun refreshData() {
-        loadPopularMountains()
-        loadHikingNews()
+        Log.d(TAG, "Manual refresh requested - real-time already active")
+        // Real-time listeners are already active, this is just for compatibility
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        Log.d(TAG, "ViewModel cleared, removing listeners")
+        mountainRepository.removeListener()
+        newsRepository.removeListener()
     }
 }
-

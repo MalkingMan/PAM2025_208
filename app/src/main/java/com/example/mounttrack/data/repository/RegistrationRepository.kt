@@ -4,6 +4,10 @@ import android.util.Log
 import com.example.mounttrack.data.firebase.FirebaseHelper
 import com.example.mounttrack.data.model.Registration
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.ListenerRegistration
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 class RegistrationRepository {
@@ -14,6 +18,76 @@ class RegistrationRepository {
 
     private val firestore = FirebaseHelper.firestore
     private val capacityRepository = RouteCapacityRepository()
+    private var registrationListener: ListenerRegistration? = null
+
+    /**
+     * Real-time stream of current (pending) registration for a user.
+     * Automatically updates when admin changes status.
+     */
+    fun getCurrentRegistrationRealtime(userId: String): Flow<Registration?> = callbackFlow {
+        Log.d(TAG, "Starting real-time current registration listener for user: $userId")
+
+        val listener = firestore.collection(FirebaseHelper.COLLECTION_REGISTRATIONS)
+            .whereEqualTo("userId", userId)
+            .whereEqualTo("status", Registration.STATUS_PENDING)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    Log.e(TAG, "Current registration listener error: ${error.message}", error)
+                    trySend(null)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null) {
+                    val registration = snapshot.documents.firstOrNull()
+                        ?.toObject(Registration::class.java)
+                    Log.d(TAG, "Real-time current registration: ${registration?.registrationId ?: "none"}")
+                    trySend(registration)
+                }
+            }
+
+        registrationListener = listener
+
+        awaitClose {
+            Log.d(TAG, "Closing current registration listener")
+            listener.remove()
+        }
+    }
+
+    /**
+     * Real-time stream of all registrations for a user (including history).
+     */
+    fun getUserRegistrationsRealtime(userId: String): Flow<List<Registration>> = callbackFlow {
+        Log.d(TAG, "Starting real-time all registrations listener for user: $userId")
+
+        val listener = firestore.collection(FirebaseHelper.COLLECTION_REGISTRATIONS)
+            .whereEqualTo("userId", userId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    Log.e(TAG, "Registrations listener error: ${error.message}", error)
+                    trySend(emptyList())
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null) {
+                    val registrations = snapshot.documents.mapNotNull { doc ->
+                        doc.toObject(Registration::class.java)
+                    }.sortedByDescending { it.createdAt }
+
+                    Log.d(TAG, "Real-time registrations update: ${registrations.size} items")
+                    trySend(registrations)
+                }
+            }
+
+        awaitClose {
+            Log.d(TAG, "Closing all registrations listener")
+            listener.remove()
+        }
+    }
+
+    fun removeListener() {
+        registrationListener?.remove()
+        registrationListener = null
+    }
 
     /**
      * Create registration with capacity validation.

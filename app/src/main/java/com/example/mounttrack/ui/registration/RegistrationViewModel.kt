@@ -76,6 +76,7 @@ class RegistrationViewModel : ViewModel() {
         phone: String,
         email: String,
         route: String,
+        routeId: String,  // Added: Route ID for proper capacity tracking
         idCardUri: String
     ) {
         _registrationState.value = RegistrationState.Loading
@@ -91,6 +92,7 @@ class RegistrationViewModel : ViewModel() {
                 userId = userId,
                 mountainId = mountainId,
                 mountainName = mountainName,
+                routeId = routeId,  // Pass routeId for capacity tracking
                 fullName = fullName,
                 dob = dob,
                 address = address,
