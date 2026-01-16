@@ -21,6 +21,15 @@
         <item name="materialCalendarTheme">@style/MountTrack_MaterialDatePicker</item>
     </style>
 
+    <!-- Splash Screen Theme -->
+    <style name="Theme.MountTrack.Splash" parent="Theme.MountTrack">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/background_dark</item>
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
     <!-- DatePicker Dialog Theme -->
     <style name="MountTrack.DatePickerDialog" parent="ThemeOverlay.MaterialComponents.MaterialCalendar">
         <item name="colorPrimary">@color/primary</item>

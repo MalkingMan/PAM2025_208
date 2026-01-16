@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">MountTrack</string>
     <string name="app_subtitle">National Hiking Registration</string>
+    <string name="version_format">Version %s</string>
 
     <!-- Auth -->
     <string name="email">Email</string>

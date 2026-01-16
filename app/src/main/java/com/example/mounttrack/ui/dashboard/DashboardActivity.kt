@@ -11,6 +11,7 @@ import com.example.mounttrack.databinding.ActivityDashboardBinding
 import com.example.mounttrack.ui.mountains.MountainsActivity
 import com.example.mounttrack.ui.mountains.detail.MountainDetailActivity
 import com.example.mounttrack.ui.news.NewsActivity
+import com.example.mounttrack.ui.news.detail.NewsDetailActivity
 import com.example.mounttrack.ui.settings.SettingsActivity
 import com.example.mounttrack.ui.status.StatusActivity
 
@@ -57,7 +58,13 @@ class DashboardActivity : AppCompatActivity() {
         }
 
         // Hiking News RecyclerView
-        hikingNewsAdapter = HikingNewsAdapter()
+        hikingNewsAdapter = HikingNewsAdapter { news ->
+            // Navigate to NewsDetailActivity when news card is clicked
+            val intent = Intent(this, NewsDetailActivity::class.java).apply {
+                putExtra(NewsDetailActivity.EXTRA_NEWS_ID, news.actualId)
+            }
+            startActivity(intent)
+        }
         binding.rvHikingNews.apply {
             adapter = hikingNewsAdapter
             layoutManager = LinearLayoutManager(this@DashboardActivity)

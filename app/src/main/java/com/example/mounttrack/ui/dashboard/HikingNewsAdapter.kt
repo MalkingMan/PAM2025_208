@@ -11,7 +11,9 @@ import com.example.mounttrack.data.model.HikingNews
 import com.example.mounttrack.databinding.ItemHikingNewsBinding
 import com.example.mounttrack.utils.ImageDecodeUtils
 
-class HikingNewsAdapter : ListAdapter<HikingNews, HikingNewsAdapter.NewsViewHolder>(NewsDiffCallback()) {
+class HikingNewsAdapter(
+    private val onNewsClick: (HikingNews) -> Unit
+) : ListAdapter<HikingNews, HikingNewsAdapter.NewsViewHolder>(NewsDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsViewHolder {
         val binding = ItemHikingNewsBinding.inflate(
@@ -54,6 +56,11 @@ class HikingNewsAdapter : ListAdapter<HikingNews, HikingNewsAdapter.NewsViewHold
             } else {
                 binding.ivNewsImage.setImageResource(R.drawable.placeholder_mountain)
             }
+
+            // Click listener to open news detail
+            binding.root.setOnClickListener {
+                onNewsClick(news)
+            }
         }
     }
 
@@ -67,4 +74,3 @@ class HikingNewsAdapter : ListAdapter<HikingNews, HikingNewsAdapter.NewsViewHold
         }
     }
 }
-
