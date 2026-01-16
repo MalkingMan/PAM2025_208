@@ -45,6 +45,23 @@
                 android:background="@drawable/bg_gradient_overlay"
                 app:layout_collapseMode="parallax" />
 
+            <!-- Weather Overlay Banner (positioned at bottom of image) -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="bottom"
+                app:layout_collapseMode="parallax">
+
+                <include
+                    android:id="@+id/weatherOverlay"
+                    layout="@layout/layout_weather_overlay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginBottom="56dp" />
+
+            </FrameLayout>
+
             <!-- Toolbar -->
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"

@@ -6,11 +6,14 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.mounttrack.R
 import com.example.mounttrack.data.model.HikingRoute
 import com.example.mounttrack.data.model.Mountain
+import com.example.mounttrack.data.model.MountainWeather
+import com.example.mounttrack.data.model.WeatherStatus
 import com.example.mounttrack.databinding.ActivityMountainDetailBinding
 import com.example.mounttrack.ui.registration.MountainRegistrationActivity
 import com.example.mounttrack.utils.ImageDecodeUtils
@@ -93,6 +96,71 @@ class MountainDetailActivity : AppCompatActivity() {
             error?.let {
                 Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
             }
+        }
+
+        // Weather observers
+        viewModel.isWeatherLoading.observe(this) { isLoading ->
+            if (isLoading) {
+                binding.weatherOverlay.weatherOverlay.visibility = View.INVISIBLE
+            }
+        }
+
+        viewModel.weather.observe(this) { weather ->
+            weather?.let {
+                displayWeatherOverlay(it)
+            } ?: run {
+                binding.weatherOverlay.weatherOverlay.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun displayWeatherOverlay(weather: MountainWeather) {
+        binding.weatherOverlay.weatherOverlay.visibility = View.VISIBLE
+
+        // Temperature
+        binding.weatherOverlay.tvTemperature.text = "${weather.temperature.toInt()}°C"
+
+        // Status text
+        binding.weatherOverlay.tvWeatherStatus.text = weather.weatherDescription
+
+        // Wind & Humidity
+        binding.weatherOverlay.tvWindSpeed.text = "${weather.windSpeed.toInt()} km/h"
+        binding.weatherOverlay.tvHumidity.text = "${weather.humidity}%"
+
+        // Weather icon with color
+        val iconRes = getWeatherIconRes(weather.weatherStatus)
+        val colorRes = getWeatherColorRes(weather.weatherStatus)
+        binding.weatherOverlay.ivWeatherIcon.setImageResource(iconRes)
+        binding.weatherOverlay.ivWeatherIcon.setColorFilter(
+            ContextCompat.getColor(this, colorRes)
+        )
+    }
+
+    private fun getWeatherIconRes(status: WeatherStatus): Int {
+        return when (status) {
+            WeatherStatus.CLEAR -> R.drawable.ic_weather_clear
+            WeatherStatus.CLOUDY -> R.drawable.ic_weather_cloudy
+            WeatherStatus.FOG -> R.drawable.ic_weather_cloudy
+            WeatherStatus.DRIZZLE -> R.drawable.ic_weather_rain
+            WeatherStatus.RAIN -> R.drawable.ic_weather_rain
+            WeatherStatus.HEAVY_RAIN -> R.drawable.ic_weather_rain
+            WeatherStatus.SNOW -> R.drawable.ic_weather_rain
+            WeatherStatus.THUNDERSTORM -> R.drawable.ic_weather_rain
+            WeatherStatus.STRONG_WIND -> R.drawable.ic_wind
+        }
+    }
+
+    private fun getWeatherColorRes(status: WeatherStatus): Int {
+        return when (status) {
+            WeatherStatus.CLEAR -> R.color.weather_clear
+            WeatherStatus.CLOUDY -> R.color.weather_cloudy
+            WeatherStatus.FOG -> R.color.weather_fog
+            WeatherStatus.DRIZZLE -> R.color.weather_fog
+            WeatherStatus.RAIN -> R.color.weather_rain
+            WeatherStatus.HEAVY_RAIN -> R.color.weather_rain
+            WeatherStatus.SNOW -> R.color.weather_rain
+            WeatherStatus.THUNDERSTORM -> R.color.weather_storm
+            WeatherStatus.STRONG_WIND -> R.color.weather_wind
         }
     }
 

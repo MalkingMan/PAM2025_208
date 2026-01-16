@@ -41,4 +41,12 @@
     <color name="difficulty_moderate">#FFC107</color>
     <color name="difficulty_hard">#FF9800</color>
     <color name="difficulty_expert">#F44336</color>
+
+    <!-- Weather Alert Colors -->
+    <color name="weather_clear">#2ECC71</color>
+    <color name="weather_cloudy">#3498DB</color>
+    <color name="weather_fog">#F39C12</color>
+    <color name="weather_rain">#E74C3C</color>
+    <color name="weather_storm">#9B59B6</color>
+    <color name="weather_wind">#E67E22</color>
 </resources>
