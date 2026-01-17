@@ -210,7 +210,7 @@ class GunungAdminDashboardViewModel : ViewModel() {
     private fun loadRouteRegistrationChart(mountainId: String) {
         viewModelScope.launch {
             try {
-                // Prefer route list from mountain (labels)
+                // Get route list from mountain
                 val routes = capacityRepository.getRoutesWithCapacity(mountainId).getOrElse { emptyList() }
 
                 val snapshot = firestore.collection("registrations")
@@ -218,49 +218,45 @@ class GunungAdminDashboardViewModel : ViewModel() {
                     .get()
                     .await()
 
-                val countsByKey = mutableMapOf<String, Int>()
+                // Build a map: routeName -> count
+                // We normalize by using routeName as the primary key to avoid duplicates
+                val countsByRouteName = mutableMapOf<String, Int>()
+                
+                // Create a lookup map from routeId to routeName
+                val routeIdToName = routes.associate { it.routeId to it.name }
+                
                 snapshot.documents.forEach { doc ->
                     val routeId = doc.getString("routeId").orEmpty()
-                    val routeName = doc.getString("route").orEmpty()
-                    val key = routeId.ifEmpty { routeName }
-                    if (key.isNotBlank()) {
-                        countsByKey[key] = (countsByKey[key] ?: 0) + 1
+                    val routeNameFromDoc = doc.getString("route").orEmpty()
+                    
+                    // Resolve the route name: prefer lookup from routes, fallback to document field
+                    val resolvedRouteName = when {
+                        routeId.isNotBlank() && routeIdToName.containsKey(routeId) -> routeIdToName[routeId]!!
+                        routeNameFromDoc.isNotBlank() -> routeNameFromDoc
+                        else -> return@forEach // Skip if no route info
                     }
+                    
+                    countsByRouteName[resolvedRouteName] = (countsByRouteName[resolvedRouteName] ?: 0) + 1
                 }
 
-                // Build chart list in a stable order: map known routes first, then unknown
-                val known = routes.mapNotNull { r ->
-                    val key = r.routeId.ifEmpty { r.name }
-                    val count = countsByKey[key] ?: countsByKey[r.name] ?: 0
-                    RouteRegistrationCount(
-                        key = key,
-                        routeId = r.routeId,
-                        routeName = r.name,
-                        count = count
-                    )
-                }
-
-                // Include registrations that reference deleted/unknown routes
-                val knownKeys = known.map { it.key }.toSet()
-                val unknown = countsByKey
-                    .filterKeys { it.isNotBlank() && !knownKeys.contains(it) }
-                    .map { (key, count) ->
+                // Build chart list - one entry per unique route name
+                val chartData = countsByRouteName
+                    .filter { it.value > 0 }
+                    .map { (routeName, count) ->
+                        // Find the corresponding route to get routeId
+                        val route = routes.find { it.name == routeName }
                         RouteRegistrationCount(
-                            key = key,
-                            routeId = "",
-                            routeName = key,
+                            key = route?.routeId ?: routeName,
+                            routeId = route?.routeId ?: "",
+                            routeName = routeName,
                             count = count
                         )
                     }
-
-                val merged = (known + unknown)
-                    .filter { it.count > 0 }
                     .sortedByDescending { it.count }
 
-                _routeRegistrationChart.value = merged
+                _routeRegistrationChart.value = chartData
             } catch (e: Exception) {
                 Log.e("GunungAdminDashboardVM", "Error loading route chart: ${e.message}", e)
-                // fail silently but keep an empty chart
                 _routeRegistrationChart.value = emptyList()
             }
         }
